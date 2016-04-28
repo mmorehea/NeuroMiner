@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import csv
 import webbrowser
+import code
 
 
 url_template = 'http://neuromorpho.org/neuron_info.jsp?neuron_name={name}'
@@ -51,13 +52,14 @@ for name in names:
     url = url_template.format(name=name)
 
     a = pd.read_html(url, attrs={'id': 'NeuronInfotable12'})[0]
+    a = a.fillna(value='')
     b = pd.DataFrame(a[1].values, index=a[0].values, columns=['Vals'])
     b.index = [x[:-2] for x in b.index]
 
     c = pd.read_html(url, attrs={'id': 'NeuronInfotable11'})[0]
+    c = c.fillna(value='')
     d = pd.DataFrame(c[1].values, index=c[0].values, columns=['Vals'])
     d.index = [x[:-2] for x in d.index]
-
     k = pd.concat([b, d])
 
     vals = []
