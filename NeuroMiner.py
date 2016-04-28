@@ -50,11 +50,11 @@ rows = []
 for name in names:
     url = url_template.format(name=name)
 
-    a = pd.read_html(url, attrs={'id': 'NeuronInfotable12'}, infer_types=False)[0]
+    a = pd.read_html(url, attrs={'id': 'NeuronInfotable12'})[0]
     b = pd.DataFrame(a[1].values, index=a[0].values, columns=['Vals'])
     b.index = [x[:-2] for x in b.index]
 
-    c = pd.read_html(url, attrs={'id': 'NeuronInfotable11'}, infer_types=False)[0]
+    c = pd.read_html(url, attrs={'id': 'NeuronInfotable11'})[0]
     d = pd.DataFrame(c[1].values, index=c[0].values, columns=['Vals'])
     d.index = [x[:-2] for x in d.index]
 
