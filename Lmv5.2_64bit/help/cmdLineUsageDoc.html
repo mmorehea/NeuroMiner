@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+   <title>L-Measure Command Line Usage</title>
+   <style>
+div.ex
+{
+width:600px;
+padding:10px;
+border:1px solid gray;
+margin:0px;
+}
+</style>
+</head>
+<body>
+<p><font size="+2"> <b>L-Measure Command Line Usage</b></font></p>
+  <p>This Document will help you to understand different input options in L-Measure.
+    <br>
+	Structure of Input:
+	  <br>
+Optional parameter = <>
+  <br>
+Mandatory Parameter = []
+  <br>
+<-l..> <-f..> <-f,f..> <-s /path to output file> <-p,-C,-w,-x,-t,-R,-G,-M> [/path to input file]
+  <br>
+The minimum selection should include:
+  <br>
+(a) Measurement: one input file and one function 
+  <br>
+(b) Conversion: one input file and one of the flags (-p. –C, -w,-x, -t) 
+  <br>
+(c) Group comparisons: one function, two input directories containing two groups of SWC files.
+  <br>
+  <br>
+<b>NOTE:</b> 
+
+<ul>
+
+<li>The flag options are case sensitive.</li>
+
+<li>L-Measure does not accept file name with spaces. 
+However, we can parse it by converting space by '*' symbol. 
+<br />
+For example: 
+<br /> 
+<i>Lm.exe -f0,0,0,10.0 -sC:\Users\Romil\Desktop\Lmv5.
+1\Lmout.txt C:\Users\Romil\Desktop\Lmv5.1\v**e_moto1.CNG.swc</i>
+<br />
+<b>OR</b>
+<br />
+We can also keep entire string inside double quotation and it will work. 
+<br />
+For example:
+<br />
+<i>Lm.exe -f0,0,0,10.0 -sC:\Users\Romil\Desktop\Lmv5.
+1\Lmout.txt "C:\Users\Romil\Desktop\Lmv5.1\v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e_moto1.CNG.swc"</i>
+</li>
+
+</ul>
+
+<b>1) When a single function is selected.</b>
+<br>
+To compute Diameter in L-Measure we need to give following command in command prompt: 
+<br>Win: Lm.exe –f9,0,0,10.0 –s &lt;/Path to output file&gt; &lt;/Path to input file&gt;
+<br>Linux: ./Lmeasure –f9,0,0,10.0 –s&lt/Path to output file&gt;&lt/Path to input file&gt;
+<div class="ex">
+Input parameters: -f9,0,0,10.0 <br>
+-f9    : the Diameter function is selected.<br>
+0       :  sets default value to 0, which denotes absolute values instead of average.<br> 
+0       :  sets default value to 0, which denotes no of bins/size of width <br>
+10.0 : sets default value for  no of bins.<br>
+-s      : is for the path of the output file.<br>
+</div>
+<br>
+<br>
+<b>2) When Double Distribution is calculated.</b><br>
+To compute Diameter in L-Measure we need to give following command in command prompt: 
+<br>Win: Lm.exe  –f1,f24,0,0,10.0  –s&lt;/Path to output file&gt; &lt;/Path to input file&gt;
+<br>Linux: ./Lmeasure  –f1,f24,0,0,10.0  –s&lt;/Path to output file&gt; &lt;/Path to input file&gt;
+<br>
+
+Other input options are same as single function except for the extra function parameter that selects the second function B that is measured in comparison with the first function A. L-Measure will return a series of values of Function A Vs Function B
+<br>
+<div class="ex">
+e.g.<br>
+# extracting the values of Contraction in comparison of N_stems. <br>
+-f1  : Function A<br>
+f24: Function B<br>
+-f1,f24,0,0,10.0  <br>
+-sD:\Komal\Temp\Testing\Testcases_for_win_v6.0\RawData\Lmout.txt <br>
+D:\Komal\Final_TestBed\Amira\JBC4L.am<br>
+</div>
+<br>
+<br>
+<b>3) Other different Type of conversions and functions.</b><br>
+If we open Lmin.txt we see the input flags that denote the operation to be performed on the input file provided. Here are some input flags that might help you to recognize how to read Lmin.txt:<br>
+<b>NOTE:</b> all the flags are case sensitive<br><br>
+
+<b>-R is for Raw data for function/s </b><br>
+Which is used to compute Compartment level functions.<br>
+<div class="ex">
+e.g.<br>
+# extracting the raw values along with the standard output for length function for the given input file.<br>
+ -f11,0,0,10.0  <br>
+-sD:\Komal\Temp\Testing\Testcases_for_win_v6.0\RawData\Lmout.txt <font color="red">-R</font> <br>
+D:\Komal\Final_TestBed\Amira\JBC4L.am<br>
+</div>
+<br>
+<b>-G is for Global Data</b><br>
+Global Data allows the user to perform Global study on multiple neurons. <br>
+<div class="ex">
+e.g.<br>
+# extracting the values from all input files and treating them as one neuron to compute width and diameter.<br>
+-f5,0,0,10.0 -f9,0,0,10.0 <br>
+-sD:\Komal\Temp\Testing\Testcases_for_win_v6.0\GlobalData\Lmout.txt <font color="red">-G </font><br>
+D:\Komal\Final_TestBed\Amira\JBC4L.am<br>
+D:\Komal\Temp\Testing\Final_TestBed\SWC\10gaaSTD.swc<br>
+</div>
+<br>
+<b>-M is when statistic is selected</b><br>
+In this example Group1 is given the SWC directory and Group2 is also given the SWC directory. A two group stat test is performed on these two groups of neurons to see if there are any significant differences between them w.r.t the selected morphometrics that are chosen in the function panel.<br>
+<div class="ex">
+e.g.<br>
+# extracting the statistical differences between the selected input directories with respect to the function width.<br>
+-f5,0,0,10.0  <br>
+-sD:\Komal\Temp\Testing\Testcases_for_win_v6.0\Statistic\Lmout.txt <font color="red">-M </font><br>
+D:\Komal\Temp\Testing\Testcases_for_win_v6.0\Statistic\1286908626593\dir1\<br>
+D:\Komal\Temp\Testing\Testcases_for_win_v6.0\Statistic\1286908626593\dir2\<br>
+</div><br>
+<b>-l is for specificity</b><br>
+Using specificity it is possible to select just a part of the neuron to be analyzed<br>
+<div class="ex">
+e.g.<br>
+# Extracting specific part of the input neuron and analyzing for height.
+<font color="red">-l1,2,2,1.0 -l1,1,8,4.0 </font> <br>-f6,0,0,10.0  <br>
+-sD:\Komal\Temp\Testing\Testcases_for_win_v6.0\Specificity\Lmout.txt <br>
+D:\Komal\Final_TestBed\SWC\59VS3.swc<br>
+</div>
+<br>
+<b>-t is for subtree</b><br>
+This option is to generate the sub trees or analyze the generated sub trees. The sub trees will be generated in SWC format.<br>
+       - If "Generate Subtrees" option is selected, the sub trees of the input neuron is created in   
+         sub_trees_dir" folder in the same location as the input neuron file. <br>
+       - If "Analyze Subtrees" is selected, only sub trees information is displayed in the Go panel. No sub
+         trees are stored in physical location.<br>
+		 <div class="ex">
+e.g.<br>
+# extracts the subtree from the input neuron.<br>
+ -sD:\Komal\Temp\Testing\Testcases_for_win_v6.0\Subtree\Lmout.txt <font color="red">-t</font> <br>
+D:\Komal\Temp\Testing\Final_TestBed\SWC\10gaaSTD.swc<br>
+</div>
+<br>
+<b>-p is for conversion to SWC format.</b><br>
+Using SWC Conversion a copy of all neurons loaded in the Input panel is converted to SWC format and saved in the same directory of the original files<br>
+<div class="ex">
+e.g.<br>
+# extracting the data from the input file and will convert it to SWC format.<br>
+-sD:\Komal\Temp\Testing\Testcases_for_win_v6.0\SWC_Conversion\Lmout.txt <font color="red">-p </font><br>
+D:\Komal\Final_TestBed\Neurolucida\allman\Source-Version\02b_pyramidal1aACC.ASC<br>
+</div>
+<br>
+<b>-w is for conversion to wrl format.</b><br>
+Using wrl Conversion a copy of all neurons loaded in the Input panel is converted to WRL format and saved in the same directory of the original files<br>
+<div class="ex">
+e.g<br>
+# extracting the data from the input file and will convert it to WRL format.<br>
+-sD:\Komal\Temp\Testing\Testcases_for_win_v6.0\WRL_Conversion\Lmout.txt <font color="red">-w</font> <br>
+D:\Komal\Temp\Testing\Final_TestBed\Soma\No+Soma\A1-May29-IR1-1A.swc.CNG.swc<br>
+</div>
+<br>
+<b>-x is for conversion to dxf format.</b><br>
+Using dxf Conversion a copy of all neurons loaded in the Input panel is converted to DXF format and saved in the same directory of the original files<br>
+<div class="ex">
+e.g<br>
+# extracting the data from the input file and will convert it to DXF format.<br>
+-sD:\Komal\Temp\Testing\Testcases_for_win_v6.0\DXF_Conversion\Lmout.txt <font color="red">-x </font><br>
+D:\Komal\Final_TestBed\Amira\JBC4L.am<br>
+</div>
+<br>
+<b>-C do PCA</b><br>
+Principal Component Analysis only applies to 3 morphological functions viz. Height, Width, and Depth. It shifts the long axis of the neuron perpendicular to the x-axis.<br>
+<div class="ex">
+e.g.<br>
+# extracting the co-ordinates and shift it to display width.
+-f5,0,0,10.0 <br>
+ -sD:\Komal\Temp\Testing\Testcases_for_win_v6.0\Random\Lmout.txt <font color="red">-C</font> <br>
+D:\Komal\Final_TestBed\SWC\71Slat1.swc<br>
+D:\Komal\Final_TestBed\SWC\71Slat1.swc<br>
+</div>
+<br>
+<a href="overview.htm" title="lm_list"><b>Back </b></a>
+</body>
+
+</html>
+
