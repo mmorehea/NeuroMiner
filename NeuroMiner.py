@@ -6,6 +6,10 @@ import pandas as pd
 import csv
 import webbrowser
 import code
+from bs4 import BeautifulSoup
+import requests
+import urllib2
+import os
 
 
 url_template = 'http://neuromorpho.org/neuron_info.jsp?neuron_name={name}'
@@ -66,6 +70,20 @@ for name in names:
     for column in columns:
         vals.append(k.ix[column, 'Vals'])
     rows.append(vals)
+
+    links = BeautifulSoup(requests.get(url).text, 'lxml').find_all('a')
+    swc_link = [x for x in links if 'Morphology File (Standardized)' in str(x)][0].get('href')
+    swc_link = 'http://neuromorpho.org/' + swc_link
+
+    if not os.path.exists('swcs/'):
+        os.makedirs('swcs/')
+
+    rq = urllib2.Request(swc_link)
+    res = urllib2.urlopen(rq)
+    swc = open('swcs/' + name + '.swc', 'wb')
+    swc.write(res.read())
+    swc.close()
+
 
 # rows = np.c_[names, rows]
 
