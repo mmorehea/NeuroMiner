@@ -10,15 +10,20 @@ from bs4 import BeautifulSoup
 import requests
 import urllib2
 import os
+import pickle
 
 
-url_template = 'http://neuromorpho.org/neuron_info.jsp?neuron_name={name}'
+url_template = 'http://neuromorpho.org/{name}'
 
 names = []
-with open('names.csv', 'rb') as f:
-    reader = csv.reader(f)
-    for row in reader:
-        names.append(row[0].split('.')[0])
+names_complete = pickle.load(open('names/names_list.p', 'rb'))
+names_somadend = pickle.load(open('names/names_list_somadend.p', 'rb'))
+names = names_complete + names_somadend
+
+# with open('names.csv', 'rb') as f:
+#     reader = csv.reader(f)
+#     for row in reader:
+#         names.append(row[0].split('.')[0])
 
 # TESTING-------------------------------------------------------------------
 testFirst = 12
@@ -80,7 +85,7 @@ for name in names:
 
     rq = urllib2.Request(swc_link)
     res = urllib2.urlopen(rq)
-    swc = open('swcs/' + name + '.swc', 'wb')
+    swc = open('swcs/' + name[28:] + '.swc', 'wb')
     swc.write(res.read())
     swc.close()
 
