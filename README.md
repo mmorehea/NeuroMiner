@@ -3,6 +3,7 @@ The following packages should be installed by default as part of Anaconda:
 + pandas
 + requests
 + beautifulsoup4
+
 This one is probably not included for you:
 + html5lib
 
