@@ -1,29 +1,29 @@
 LMeasure v$REVISION: 510 Release Lmv5.2
-argc:57Neuron#:1 /home/mdm/code/NeuroMiner/swcs/HSE-cobalt.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-cobalt.swc
-Neuron#:2 /home/mdm/code/NeuroMiner/swcs/HSE-fluoro01.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-fluoro01.swc
-Neuron#:3 /home/mdm/code/NeuroMiner/swcs/HSE-fluoro02.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-fluoro02.swc
-Neuron#:4 /home/mdm/code/NeuroMiner/swcs/HSE-fluoro03.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-fluoro03.swc
-Neuron#:5 /home/mdm/code/NeuroMiner/swcs/HSE-fluoro04.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-fluoro04.swc
-Neuron#:6 /home/mdm/code/NeuroMiner/swcs/HSE-fluoro05.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-fluoro05.swc
-Neuron#:7 /home/mdm/code/NeuroMiner/swcs/HSE-fluoro06.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-fluoro06.swc
-Neuron#:8 /home/mdm/code/NeuroMiner/swcs/HSE-fluoro07.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-fluoro07.swc
-Neuron#:9 /home/mdm/code/NeuroMiner/swcs/HSE-fluoro08.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-fluoro08.swc
-Neuron#:10 /home/mdm/code/NeuroMiner/swcs/HSE-fluoro09.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-fluoro09.swc
-Neuron#:11 /home/mdm/code/NeuroMiner/swcs/HSE-fluoro10.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//HSE-fluoro10.swc
-Neuron#:12 /home/mdm/code/NeuroMiner/swcs/dCH-cobalt.swc
-Single Neuron://home//mdm//code//NeuroMiner//swcs//dCH-cobalt.swc
-Current local time and date:Sun May  1 21:02:36 2016
+argc:57Neuron#:1 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-cobalt.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-cobalt.swc
+Neuron#:2 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro01.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-fluoro01.swc
+Neuron#:3 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro02.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-fluoro02.swc
+Neuron#:4 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro03.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-fluoro03.swc
+Neuron#:5 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro04.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-fluoro04.swc
+Neuron#:6 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro05.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-fluoro05.swc
+Neuron#:7 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro06.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-fluoro06.swc
+Neuron#:8 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro07.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-fluoro07.swc
+Neuron#:9 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro08.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-fluoro08.swc
+Neuron#:10 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro09.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-fluoro09.swc
+Neuron#:11 /home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro10.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//HSE-fluoro10.swc
+Neuron#:12 /home/maher/mahersfolder/NeuroMiner/swcs/dCH-cobalt.swc
+Single Neuron://home//maher//mahersfolder//NeuroMiner//swcs//dCH-cobalt.swc
+Current local time and date:Mon May  2 11:52:47 2016
 
 
 
@@ -36,11 +36,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-cobalt.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-cobalt.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-cobalt.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-cobalt.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1  String........: -1
@@ -51,7 +51,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,16.996,-33.986,-3.4:714.649
 current id is 1 and next2() is traversed1,16.996,-33.986,-3.4:289.724
 current id is 1 and next2() is traversed1,16.996,-33.986,-3.4:73.5
-removed all 1593 segsCurrent local time and date:Sun May  1 21:02:36 2016
+removed all 1593 segsCurrent local time and date:Mon May  2 11:52:47 2016
 
 
 
@@ -64,11 +64,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-fluoro01.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro01.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-fluoro01.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro01.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1  String........: -1
@@ -79,7 +79,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,-8.13,10.12,2.23:271.18
 current id is 1 and next2() is traversed1,-8.13,10.12,2.23:784.04
 current id is 1 and next2() is traversed1,-8.13,10.12,2.23:154.98
-removed all 1822 segsCurrent local time and date:Sun May  1 21:02:37 2016
+removed all 1822 segsCurrent local time and date:Mon May  2 11:52:47 2016
 
 
 
@@ -92,11 +92,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-fluoro02.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro02.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-fluoro02.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro02.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1  String........: -1
@@ -107,7 +107,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,13.44,12.03,11.91:270.14
 current id is 1 and next2() is traversed1,13.44,12.03,11.91:915.69
 current id is 1 and next2() is traversed1,13.44,12.03,11.91:102.34
-removed all 699 segsCurrent local time and date:Sun May  1 21:02:37 2016
+removed all 699 segsCurrent local time and date:Mon May  2 11:52:47 2016
 
 
 
@@ -120,11 +120,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-fluoro03.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro03.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-fluoro03.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro03.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1.66  String........: -1
@@ -135,7 +135,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,-1.66,4.9,2.44:185.2
 current id is 1 and next2() is traversed1,-1.66,4.9,2.44:703.19
 current id is 1 and next2() is traversed1,-1.66,4.9,2.44:137.8
-removed all 1609 segsCurrent local time and date:Sun May  1 21:02:37 2016
+removed all 1609 segsCurrent local time and date:Mon May  2 11:52:47 2016
 
 
 
@@ -148,11 +148,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-fluoro04.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro04.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-fluoro04.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro04.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1  String........: -1
@@ -163,7 +163,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,10.54,56.31,5.61:260.49
 current id is 1 and next2() is traversed1,10.54,56.31,5.61:831.21
 current id is 1 and next2() is traversed1,10.54,56.31,5.61:65.25
-removed all 1430 segsCurrent local time and date:Sun May  1 21:02:37 2016
+removed all 1430 segsCurrent local time and date:Mon May  2 11:52:48 2016
 
 
 
@@ -176,11 +176,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-fluoro05.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro05.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-fluoro05.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro05.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-16.48  String........: -1
@@ -191,7 +191,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,-16.48,16.92,0.1:265.88
 current id is 1 and next2() is traversed1,-16.48,16.92,0.1:668.38
 current id is 1 and next2() is traversed1,-16.48,16.92,0.1:71.6
-removed all 1205 segsCurrent local time and date:Sun May  1 21:02:37 2016
+removed all 1205 segsCurrent local time and date:Mon May  2 11:52:48 2016
 
 
 
@@ -204,11 +204,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-fluoro06.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro06.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-fluoro06.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro06.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1  String........: -1
@@ -219,7 +219,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,9.28,11.43,-4.47:278.86
 current id is 1 and next2() is traversed1,9.28,11.43,-4.47:829.94
 current id is 1 and next2() is traversed1,9.28,11.43,-4.47:77.48
-removed all 1331 segsCurrent local time and date:Sun May  1 21:02:37 2016
+removed all 1331 segsCurrent local time and date:Mon May  2 11:52:48 2016
 
 
 
@@ -232,11 +232,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-fluoro07.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro07.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-fluoro07.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro07.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1  String........: -1
@@ -247,7 +247,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,-2.15,4.78,-4.31:249.3
 current id is 1 and next2() is traversed1,-2.15,4.78,-4.31:694.69
 current id is 1 and next2() is traversed1,-2.15,4.78,-4.31:123.58
-removed all 1195 segsCurrent local time and date:Sun May  1 21:02:37 2016
+removed all 1195 segsCurrent local time and date:Mon May  2 11:52:48 2016
 
 
 
@@ -260,11 +260,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-fluoro08.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro08.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-fluoro08.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro08.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1  String........: -1
@@ -275,7 +275,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,-7.76,11.37,8.23:236.46
 current id is 1 and next2() is traversed1,-7.76,11.37,8.23:865.59
 current id is 1 and next2() is traversed1,-7.76,11.37,8.23:54.07
-removed all 864 segsCurrent local time and date:Sun May  1 21:02:38 2016
+removed all 864 segsCurrent local time and date:Mon May  2 11:52:48 2016
 
 
 
@@ -288,11 +288,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-fluoro09.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro09.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-fluoro09.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro09.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1  String........: -1
@@ -303,7 +303,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,-2.43,4.28,1.16:262.27
 current id is 1 and next2() is traversed1,-2.43,4.28,1.16:828.21
 current id is 1 and next2() is traversed1,-2.43,4.28,1.16:117.39
-removed all 1247 segsCurrent local time and date:Sun May  1 21:02:38 2016
+removed all 1247 segsCurrent local time and date:Mon May  2 11:52:48 2016
 
 
 
@@ -316,11 +316,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/HSE-fluoro10.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro10.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/HSE-fluoro10.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/HSE-fluoro10.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1  String........: -1
@@ -331,7 +331,7 @@ Neuron() done
 current id is 1 and next2() is traversed1,-3.66,7.34,2.37:275.48
 current id is 1 and next2() is traversed1,-3.66,7.34,2.37:878.3
 current id is 1 and next2() is traversed1,-3.66,7.34,2.37:98.01
-removed all 881 segsCurrent local time and date:Sun May  1 21:02:38 2016
+removed all 881 segsCurrent local time and date:Mon May  2 11:52:49 2016
 
 
 
@@ -344,11 +344,11 @@ inputFileType...swc
 
 
 
-Valid file../home/mdm/code/NeuroMiner/swcs/dCH-cobalt.swc
+Valid file../home/maher/mahersfolder/NeuroMiner/swcs/dCH-cobalt.swc
 
 
 
-creating neuron:/home/mdm/code/NeuroMiner/swcs/dCH-cobalt.swc
+creating neuron:/home/maher/mahersfolder/NeuroMiner/swcs/dCH-cobalt.swc
 c............... :1  String........: 1
 c............... :1  String........: 1
 c............... :-1  String........: -1
@@ -362,5 +362,5 @@ current id is 1 and next2() is traversed1,-419.15,-22.7,95.4:111.7
 branchlen<=0.1 262.45,26.1,-54.4 3 0.1
 branchlen<=0.1 262.45,26.1,-54.4 3 0.1
 branchlen<=0.1 262.45,26.1,-54.4 3 0.1
-removed all 6248 segsCurrent local time and date:Sun May  1 21:02:39 2016
+removed all 6248 segsCurrent local time and date:Mon May  2 11:52:50 2016
  

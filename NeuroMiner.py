@@ -11,6 +11,7 @@ import requests
 import urllib2
 import os
 import pickle
+import time
 
 def mine(url):
 
@@ -93,14 +94,31 @@ columns += ["NeuroMorpho.Org ID", "Neuron Name", "Archive Name",
 
 total_cell_number = str(len(names))
 rows = []
+
+mineav = []
+grabav = []
 for cell_number, name in enumerate(names):
     
     print "Getting " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
     url = url_template.format(name=name)
 
+    Astart = time.time()
     rows = mine(url)
+    Aend = time.time()
+    timez = Aend - Astart
+    print '\nmine time: ' + str(timez)
+    mineav.append(timez)
 
+    Bstart = time.time()
     grabFile(url, name)
+    Bend = time.time()
+    timez = Bend - Bstart
+    print 'grab file time: ' + str(timez) + '\n'
+    grabav.append(timez)
+
+print "mine average: " + str(sum(mineav) / len(mineav))
+
+print "grab file average: " + str(sum(grabav) / len(grabav))
 
 frame = pd.DataFrame(np.array(rows), columns=columns)
 
