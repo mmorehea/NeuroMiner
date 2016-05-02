@@ -11,7 +11,11 @@ import requests
 import urllib2
 import os
 import pickle
+<<<<<<< HEAD
 import time
+=======
+import glob
+>>>>>>> 61dae9ee8ef6f41d1ad4950a9bace30d4d9806bb
 
 def mine(url):
 
@@ -92,6 +96,9 @@ columns += ["NeuroMorpho.Org ID", "Neuron Name", "Archive Name",
             "Average Bifurcation Angle Local",
             "Average Bifurcation Angle Remote", "Fractal Dimension"]
 
+existing_swcs = glob.glob('./swcs/*.swc')
+start_index = len(existing_swcs)
+
 total_cell_number = str(len(names))
 rows = []
 
@@ -109,7 +116,14 @@ for cell_number, name in enumerate(names):
     print '\nmine time: ' + str(timez)
     mineav.append(timez)
 
+<<<<<<< HEAD
     Bstart = time.time()
+=======
+    if cell_number < start_index:
+        print 'Cell ' + str(cell_number + 1) + ' has already been grabbed.'
+        continue
+
+>>>>>>> 61dae9ee8ef6f41d1ad4950a9bace30d4d9806bb
     grabFile(url, name)
     Bend = time.time()
     timez = Bend - Bstart
