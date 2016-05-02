@@ -11,11 +11,8 @@ import requests
 import urllib2
 import os
 import pickle
-<<<<<<< HEAD
-import time
-=======
 import glob
->>>>>>> 61dae9ee8ef6f41d1ad4950a9bace30d4d9806bb
+
 
 def mine(url):
 
@@ -102,37 +99,29 @@ start_index = len(existing_swcs)
 total_cell_number = str(len(names))
 rows = []
 
-mineav = []
-grabav = []
+
 for cell_number, name in enumerate(names):
+    if cell_number < start_index:
+        print 'Cell ' + str(cell_number + 1) + ' has already been grabbed.'
+        continue
     
     print "Getting " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
     url = url_template.format(name=name)
 
-    Astart = time.time()
-    rows = mine(url)
-    Aend = time.time()
-    timez = Aend - Astart
-    print '\nmine time: ' + str(timez)
-    mineav.append(timez)
-
-<<<<<<< HEAD
-    Bstart = time.time()
-=======
-    if cell_number < start_index:
-        print 'Cell ' + str(cell_number + 1) + ' has already been grabbed.'
-        continue
-
->>>>>>> 61dae9ee8ef6f41d1ad4950a9bace30d4d9806bb
     grabFile(url, name)
-    Bend = time.time()
-    timez = Bend - Bstart
-    print 'grab file time: ' + str(timez) + '\n'
-    grabav.append(timez)
 
-print "mine average: " + str(sum(mineav) / len(mineav))
 
-print "grab file average: " + str(sum(grabav) / len(grabav))
+for cell_number, name in enumerate(names):
+    print "Mining " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
+    url = url_template.format(name=name)
+    rows = mine(url)
+
+      
+
+    
+    
+
+
 
 frame = pd.DataFrame(np.array(rows), columns=columns)
 
