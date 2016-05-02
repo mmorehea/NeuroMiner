@@ -11,6 +11,7 @@ import requests
 import urllib2
 import os
 import pickle
+import glob
 
 def mine(url):
 
@@ -91,6 +92,9 @@ columns += ["NeuroMorpho.Org ID", "Neuron Name", "Archive Name",
             "Average Bifurcation Angle Local",
             "Average Bifurcation Angle Remote", "Fractal Dimension"]
 
+existing_swcs = glob.glob('./swcs/*.swc')
+start_index = len(existing_swcs)
+
 total_cell_number = str(len(names))
 rows = []
 for cell_number, name in enumerate(names):
@@ -99,6 +103,10 @@ for cell_number, name in enumerate(names):
     url = url_template.format(name=name)
 
     rows = mine(url)
+
+    if cell_number < start_index:
+        print 'Cell ' + str(cell_number + 1) + ' has already been grabbed.'
+        continue
 
     grabFile(url, name)
 
