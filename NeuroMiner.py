@@ -26,8 +26,8 @@ names = names_complete + names_somadend
 #         names.append(row[0].split('.')[0])
 
 # TESTING-------------------------------------------------------------------
-testFirst = 12
-names = names[:testFirst]
+# testFirst = 12
+# names = names[:testFirst]
 # --------------------------------------------------------------------------
 
 names = np.array(names).transpose()
@@ -55,9 +55,10 @@ columns += ["NeuroMorpho.Org ID", "Neuron Name", "Archive Name",
             "Average Bifurcation Angle Local",
             "Average Bifurcation Angle Remote", "Fractal Dimension"]
 
-
+total_cell_number = str(len(names))
 rows = []
-for name in names:
+for cell_number, name in enumerate(names):
+    print "Getting " + name + ', cell ' + str(cell_number) + ' / ' + total_cell_number
     url = url_template.format(name=name)
 
     a = pd.read_html(url, attrs={'id': 'NeuronInfotable12'})[0]
