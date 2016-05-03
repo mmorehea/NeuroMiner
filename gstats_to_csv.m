@@ -1,9 +1,13 @@
-% Sends results of stats_tree for each swc to gstats.csv
-% NOTE: Set TREES_PATH to the path of your TREES toolbox below
+% Takes swcs and performs stats_tree, exports gstats to gstats.csv
 
-TREES_PATH = '';
+%=============================| OPTIONS |=================================%
+TREES_PATH      = '';      % path to your TREES toolbox directory
+PRINT_PROGRESS  = true;    % print progress indications to command window
+WRITE_HEADERS   = true;    % print column headers to csv
+%=========================================================================%
+
+
 addpath(TREES_PATH);
-
 start_trees;
 pathPrefix  = 'swcs/';
 swcsPath = strcat(pathPrefix, '*.swc');
@@ -11,12 +15,15 @@ swcsPath = strcat(pathPrefix, '*.swc');
 swcs = dir(swcsPath);
 swcNames = cell(length(swcs), 1);
 
-% Store names, load stats
+% Store names, compute stats
 for i = 1:length(swcs)
     swcNames{i} = swcs(i,1).name(1:end-4);
     treePath = strcat(pathPrefix, swcFiles{i});
     load_tree(treePath);
     stats = stats_tree([],[],[],'-x');
+    if PRINT_PROGRESS
+        fprintf('Computed gstats for swc %d of %d...\n', i, length(swcs));
+    end
 end
 
 gstatsFields = fieldnames(stats.gstats);
@@ -24,13 +31,15 @@ gstatsLastField = gstatsFields{numel(gstatsFields)};
 csvFile = fopen('gstats.csv', 'w');
 
 % Write headers to CSV file
-fprintf(csvFile, 'name,');
-for i = 1:numel(gstatsFields) - 1
-    fprintf(csvFile, gstatsFields{i});
-    fprintf(csvFile, ',');
+if WRITE_HEADERS
+    fprintf(csvFile, 'name,');
+    for i = 1:numel(gstatsFields) - 1
+        fprintf(csvFile, gstatsFields{i});
+        fprintf(csvFile, ',');
+    end
+    fprintf(csvFile, gstatsLastField);
+    fprintf(csvFile, '\r\n');
 end
-fprintf(csvFile, gstatsLastField);
-fprintf(csvFile, '\r\n');
 
 % Write names and stats to CSV file
 for i = 1:length(swcs)
@@ -43,6 +52,10 @@ for i = 1:length(swcs)
     end
     fprintf(csvFile, '%d', stats.gstats.(gstatsLastField)(i));
     fprintf(csvFile, '\r\n');
+    if PRINT_PROGRESS
+       fprintf('Wrote gstats for swc %d of %d...\n', i, length(swcs));
+    end
 end
 
 fclose(csvFile);
+fprintf('All finished!\n');
