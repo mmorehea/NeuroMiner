@@ -13,10 +13,12 @@ pathPrefix  = 'swcs/';
 swcsPath = strcat(pathPrefix, '*.swc');
 
 swcs = dir(swcsPath);
+swcFiles = cell(length(swcs), 1);
 swcNames = cell(length(swcs), 1);
 
 % Store names, compute stats
 for i = 1:length(swcs)
+    swcFiles{i} = swcs(i,1).name;
     swcNames{i} = swcs(i,1).name(1:end-4);
     treePath = strcat(pathPrefix, swcFiles{i});
     load_tree(treePath);
