@@ -12,6 +12,7 @@ import urllib2
 import os
 import pickle
 import glob
+import string
 
 
 def mine(url):
@@ -28,8 +29,27 @@ def mine(url):
     k = pd.concat([b, d])
 
     vals = []
+    printable = set(string.printable)
     for column in columns:
-        vals.append(k.ix[column, 'Vals'])
+        val = k.ix[column, 'Vals']
+
+        #Change months and years to days
+        if column == 'Min Age' or 'Max Age':
+            if 'months' in val or 'month' in val:
+                number_of_days = 365 * float(val.split()[0]) / 12
+                val = str(number_of_days)
+            if 'years' in val or 'year' in val:
+                number_of_days = 365 * float(val.split()[0])
+                val = str(number_of_days) 
+
+        #Get rid of the microns
+        if u'\xa0\u03bcm' in val:
+            val = val[:val.index(u'\xa0\u03bcm')]
+
+        #Get rid of degree signs and any other annoying character
+        val = filter(lambda x: x in printable, val)
+        
+        vals.append(val)
     rows.append(vals)
 
     return rows
@@ -57,11 +77,6 @@ names = []
 names_complete = pickle.load(open('names/names_list.p', 'rb'))
 names_somadend = pickle.load(open('names/names_list_somadend.p', 'rb'))
 names = names_complete + names_somadend
-
-# with open('names.csv', 'rb') as f:
-#     reader = csv.reader(f)
-#     for row in reader:
-#         names.append(row[0].split('.')[0])
 
 # TESTING-------------------------------------------------------------------
 testFirst = 12
@@ -116,13 +131,9 @@ for cell_number, name in enumerate(names):
     url = url_template.format(name=name)
     rows = mine(url)
 
-      
+frame = pd.DataFrame(np.array(rows), index=names, columns=columns)
 
-    
-    
+if os.path.exists('neuroData.csv'):
+    os.remove('neuroData.csv')
 
-
-
-frame = pd.DataFrame(np.array(rows), columns=columns)
-
-frame.to_csv('neuroData.csv', encoding='UTF-16')
+frame.to_csv('neuroData.csv')
