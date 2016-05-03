@@ -20,31 +20,28 @@ for i = 1:length(swcs)
 end
 
 gstatsFields = fieldnames(stats.gstats);
+gstatsLastField = gstatsFields{numel(gstatsFields)};
 csvFile = fopen('gstats.csv', 'w');
 
 % Write headers to CSV file
 fprintf(csvFile, 'name,');
 for i = 1:numel(gstatsFields) - 1
-    
     fprintf(csvFile, gstatsFields{i});
     fprintf(csvFile, ',');
-    
 end
-fprintf(csvFile, gstatsFields{numel(gstatsFields)});
+fprintf(csvFile, gstatsLastField);
 fprintf(csvFile, '\r\n');
 
 % Write names and stats to CSV file
 for i = 1:length(swcs)
-    
     fprintf(csvFile, swcNames{i});
     fprintf(csvFile, ',');
-    
     for j = 1:numel(gstatsFields) - 1
-       fprintf(csvFile, '%d', (stats.gstats.(gstatsFields{j})(i)));
+       currentField = stats.gstats.(gstatsFields{j});
+       fprintf(csvFile, '%d', currentField(i));
        fprintf(csvFile, ',');
     end
-    
-    fprintf(csvFile, '%d', stats.gstats.(gstatsFields{numel(gstatsFields)})(i));
+    fprintf(csvFile, '%d', stats.gstats.(gstatsLastField)(i));
     fprintf(csvFile, '\r\n');
 end
 
