@@ -25,4 +25,4 @@ for i, name in enumerate(nameSet):
 
 newFrame.index = list(nameSet)
 
-newFrame.to_csv('fixedTest.csv')
+newFrame.to_csv('fixedLM.csv')
