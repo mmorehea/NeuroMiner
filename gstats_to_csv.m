@@ -7,7 +7,7 @@ WRITE_HEADERS   = true;    % print column headers to csv
 %=========================================================================%
 
 
-addpath(TREES_PATH);
+addpath(genpath(TREES_PATH));
 start_trees;
 pathPrefix  = 'swcs/';
 swcsPath = strcat(pathPrefix, '*.swc');
