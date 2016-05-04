@@ -40,7 +40,9 @@ def mine(url):
                 val = str(number_of_days)
             if 'years' in val or 'year' in val:
                 number_of_days = 365 * float(val.split()[0])
-                val = str(number_of_days) 
+                val = str(number_of_days)
+            if 'days' in val or 'day' in val:
+                val = val[:-4] 
 
         #Get rid of the microns
         if u'\xa0\u03bcm' in val:
