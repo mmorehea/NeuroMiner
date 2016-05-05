@@ -1,4 +1,4 @@
-"""Glob all the swc files and break them up into separate directories of 1000 each."""
+"""Glob all the swc files and break them up into separate directories of 1500 each."""
 # -*- coding: utf-8 -*-
 
 import numpy as np
@@ -12,14 +12,34 @@ import urllib2
 import os
 import pickle
 import glob
+import shutil
 
-path = raw_input('Please input the path to the directory with all the swc files: ')
+path = './swcs/*.swc'
 swcs = glob.iglob(path)
 
-code.interact(local=locals())
+directory = []
+totalAdded = 0
 
-totalGroups = 1 + len(swcs)/1000 
+while True:
+	try:
+		directory.append(swcs.next())
+	except:
 
-code.interact(local=locals())
+		name = str(totalAdded - ((totalAdded % 1500) - 1)) + ' - ' + str(totalAdded) 
+		os.mkdir('./swcs/' + name)
+		for f in directory:
+			shutil.move(f, './swcs/' + name)
+		directory = []
 
-# for swc in swcs:
+		break
+
+	totalAdded += 1
+
+	print 'Processed '  + str(totalAdded) + ' files.'
+
+	if totalAdded % 1500 == 0:
+		name = str(totalAdded - 1499) + ' - ' + str(totalAdded) 
+		os.mkdir('./swcs/' + name)
+		for f in directory:
+			shutil.move(f, './swcs/' + name)
+		directory = []
