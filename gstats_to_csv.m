@@ -19,19 +19,27 @@ swcNames = cell(length(swcs), 1);
 
 csvFile = fopen('gstats.csv', 'w');
 
-
+tic;
 % Store names, compute stats
 for i = 1:length(swcs)
-
+    if mod(i,100) == 0
+        fprintf('Computed gstats for swc %d of %d...\n', i, length(swcs));
+        toc;
+        tic;
+    end
+        
     swcName = swcs(i,1).name(1:end-4);
     treePath = strcat(pathPrefix, swcName, '.swc');
 
     load_tree(treePath);
     stats = stats_tree([],[],[],'-x');
     
-    if PRINT_PROGRESS
-        fprintf('Computed gstats for swc %d of %d...\n', i, length(swcs));
-    end
+    
+    
+    sholl = sholl_tree(1, 1);
+    radius = length(sholl);
+    sholl = sholl_tree(1, radius/49);
+    
     
     fprintf(csvFile, swcName);
     fprintf(csvFile, ',');
@@ -39,12 +47,15 @@ for i = 1:length(swcs)
     gstatsFields = fieldnames(stats.gstats);
     gstatsLastField = gstatsFields{numel(gstatsFields)};
     
-    for j = 1:numel(gstatsFields) - 1
+    for j = 1:numel(gstatsFields)
        currentField = stats.gstats.(gstatsFields{j});
        fprintf(csvFile, '%d', currentField);
        fprintf(csvFile, ',');
     end
-    fprintf(csvFile, '%d', stats.gstats.(gstatsLastField));
+    for j = 1:length(sholl)
+        fprintf(csvFile, '%d', sholl(j));
+        fprintf(csvFile, ',');
+    end
     fprintf(csvFile, '\r\n');
     stats = [];
     trees = [];
