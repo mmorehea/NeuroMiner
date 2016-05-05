@@ -35,8 +35,9 @@ for i = lineCount:length(swcs)
     swcName = swcs(i,1).name(1:end-4);
     treePath = strcat(pathPrefix, swcName, '.swc');
 
-    load_tree(treePath);
+    
     try
+        load_tree(treePath);
         stats = stats_tree([],[],[],'-x');
     catch
         fprintf('Failed to gather stats, skipping file %s \n', swcName);

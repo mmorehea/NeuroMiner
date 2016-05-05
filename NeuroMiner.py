@@ -42,7 +42,7 @@ def mine(url):
                 number_of_days = 365 * float(val.split()[0])
                 val = str(number_of_days)
             if 'days' in val or 'day' in val:
-                val = val[:-4] 
+                val = val[:-4]
 
         #Get rid of the microns
         if u'\xa0\u03bcm' in val:
@@ -50,7 +50,7 @@ def mine(url):
 
         #Get rid of degree signs and any other annoying character
         val = filter(lambda x: x in printable, val)
-        
+
         vals.append(val)
     rows.append(vals)
 
@@ -117,25 +117,29 @@ total_cell_number = str(len(names))
 rows = []
 
 
+# for cell_number, name in enumerate(names):
+#     if cell_number < start_index:
+#         print 'Cell ' + str(cell_number + 1) + ' has already been grabbed.'
+#         continue
+#
+#     print "Getting " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
+#     url = url_template.format(name=name)
+#
+#     grabFile(url, name)
+list_of_known_swcs = np.genfromtxt('./neuroData.csv', delimiter=',', usecols=1, dtype=str)
+
+
 for cell_number, name in enumerate(names):
-    if cell_number < start_index:
-        print 'Cell ' + str(cell_number + 1) + ' has already been grabbed.'
-        continue
-    
-    print "Getting " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
-    url = url_template.format(name=name)
-
-    grabFile(url, name)
-
-
-for cell_number, name in enumerate(names):
+    if name in list_of_known_swcs:
+        print "skipping, already seen it"
     print "Mining " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
     url = url_template.format(name=name)
     rows = mine(url)
+    if cell_number%500 == 0:
+        if os.path.exists('neuroData.csv'):
+            os.remove('neuroData.csv')
+        frame = pd.DataFrame(np.array(rows), index=names, columns=columns)
+        frame.to_csv('neuroData.csv')
 
 frame = pd.DataFrame(np.array(rows), index=names, columns=columns)
-
-if os.path.exists('neuroData.csv'):
-    os.remove('neuroData.csv')
-
-frame.to_csv('neuroData.csv')
+frame.to_csv('neuroDataFinal.csv')
