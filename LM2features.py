@@ -23,6 +23,9 @@ for i, name in enumerate(nameSet):
 	values = fromcsv.ix[name, 1].values
 	newFrame.loc[i] = values
 
-newFrame.index = list(nameSet)
+newFrame.index = ['neuron_info.jsp?neuron_name=' + x[31:-4] for x in nameSet]
+
+if os.path.exists('fixedLM.csv'):
+    os.remove('fixedLM.csv')
 
 newFrame.to_csv('fixedLM.csv')

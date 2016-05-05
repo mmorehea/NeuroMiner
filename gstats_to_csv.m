@@ -13,6 +13,7 @@ pathPrefix  = './swcs/';
 swcsPath = strcat(pathPrefix, '*.swc');
 
 swcs = dir(swcsPath);
+swcFiles = cell(length(swcs), 1);
 swcNames = cell(length(swcs), 1);
 
 
@@ -21,8 +22,10 @@ csvFile = fopen('gstats.csv', 'w');
 
 % Store names, compute stats
 for i = 1:length(swcs)
+
     swcName = swcs(i,1).name(1:end-4);
     treePath = strcat(pathPrefix, swcName, '.swc');
+
     load_tree(treePath);
     stats = stats_tree([],[],[],'-x');
     
