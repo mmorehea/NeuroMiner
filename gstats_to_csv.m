@@ -59,7 +59,6 @@ for i = 1:length(swcs)
     fprintf(csvFile, '\r\n');
     stats = [];
     trees = [];
-end
 
 
 fclose(csvFile);
