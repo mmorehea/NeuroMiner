@@ -17,11 +17,15 @@ swcFiles = cell(length(swcs), 1);
 swcNames = cell(length(swcs), 1);
 
 
-csvFile = fopen('gstats.csv', 'w');
-
+csvFile = fopen('gstats.csv', 'a+');
+%=========ONLY WORKS ON LINUX================
+[status, cmdout]= system('wc -l gstats.csv');
+scanCell = textscan(cmdout,'%u %s');
+lineCount = scanCell{1}
+%=========ONLY WORKS ON LINUX================
 tic;
 % Store names, compute stats
-for i = 1:length(swcs)
+for i = lineCount:length(swcs)
     if mod(i,100) == 0
         fprintf('Computed gstats for swc %d of %d...\n', i, length(swcs));
         toc;
@@ -32,8 +36,14 @@ for i = 1:length(swcs)
     treePath = strcat(pathPrefix, swcName, '.swc');
 
     load_tree(treePath);
-    stats = stats_tree([],[],[],'-x');
-    
+    try
+        stats = stats_tree([],[],[],'-x');
+    catch
+        fprintf('Failed to gather stats, skipping file %s \n', swcName);
+        stats = [];
+        trees = [];
+        continue;
+    end
     
     
     sholl = sholl_tree(1, 1);
@@ -59,6 +69,7 @@ for i = 1:length(swcs)
     fprintf(csvFile, '\r\n');
     stats = [];
     trees = [];
+end
 
 
 fclose(csvFile);
