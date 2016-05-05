@@ -16,7 +16,7 @@ toMerge = []
 
 minedSet = pd.read_csv('neuroData.csv', index_col=0)
 
-lmSet = pd.read_csv('fixedLM.csv', index_col=0, encoding='UTF-8')
+lmSet = pd.read_csv('fixedLmResult.csv', index_col=0, encoding='UTF-8')
 
 #treeSet = pd.read_csv('gstats.csv', header=None, encoding='UTF-16')
 
