@@ -1,7 +1,7 @@
 % Takes swcs and performs stats_tree, exports gstats to gstats.csv
 
 %=============================| OPTIONS |=================================%
-TREES_PATH      = '';      % path to your TREES toolbox directory
+TREES_PATH      = '/home/mdm/code/TREES';      % path to your TREES toolbox directory
 PRINT_PROGRESS  = true;    % print progress indications to command window
 WRITE_HEADERS   = true;    % print column headers to csv
 %=========================================================================%
@@ -9,55 +9,57 @@ WRITE_HEADERS   = true;    % print column headers to csv
 
 addpath(genpath(TREES_PATH));
 start_trees;
-pathPrefix  = 'swcs/';
+pathPrefix  = './swcs/';
 swcsPath = strcat(pathPrefix, '*.swc');
 
 swcs = dir(swcsPath);
 swcFiles = cell(length(swcs), 1);
 swcNames = cell(length(swcs), 1);
 
-% Store names, compute stats
-for i = 1:length(swcs)
-    swcFiles{i} = swcs(i,1).name;
-    swcNames{i} = swcs(i,1).name(1:end-4);
-    treePath = strcat(pathPrefix, swcFiles{i});
-    load_tree(treePath);
-    stats = stats_tree([],[],[],'-x');
-    if PRINT_PROGRESS
-        fprintf('Computed gstats for swc %d of %d...\n', i, length(swcs));
-    end
-end
 
-gstatsFields = fieldnames(stats.gstats);
-gstatsLastField = gstatsFields{numel(gstatsFields)};
 csvFile = fopen('gstats.csv', 'w');
 
-% Write headers to CSV file
-if WRITE_HEADERS
-    fprintf(csvFile, 'name,');
-    for i = 1:numel(gstatsFields) - 1
-        fprintf(csvFile, gstatsFields{i});
-        fprintf(csvFile, ',');
-    end
-    fprintf(csvFile, gstatsLastField);
-    fprintf(csvFile, '\r\n');
-end
-
-% Write names and stats to CSV file
+tic;
+% Store names, compute stats
 for i = 1:length(swcs)
-    fprintf(csvFile, swcNames{i});
+    if mod(i,100) == 0
+        fprintf('Computed gstats for swc %d of %d...\n', i, length(swcs));
+        toc;
+        tic;
+    end
+        
+    swcName = swcs(i,1).name(1:end-4);
+    treePath = strcat(pathPrefix, swcName, '.swc');
+
+    load_tree(treePath);
+    stats = stats_tree([],[],[],'-x');
+    
+    
+    
+    sholl = sholl_tree(1, 1);
+    radius = length(sholl);
+    sholl = sholl_tree(1, radius/49);
+    
+    
+    fprintf(csvFile, swcName);
     fprintf(csvFile, ',');
-    for j = 1:numel(gstatsFields) - 1
+    
+    gstatsFields = fieldnames(stats.gstats);
+    gstatsLastField = gstatsFields{numel(gstatsFields)};
+    
+    for j = 1:numel(gstatsFields)
        currentField = stats.gstats.(gstatsFields{j});
-       fprintf(csvFile, '%d', currentField(i));
+       fprintf(csvFile, '%d', currentField);
        fprintf(csvFile, ',');
     end
-    fprintf(csvFile, '%d', stats.gstats.(gstatsLastField)(i));
-    fprintf(csvFile, '\r\n');
-    if PRINT_PROGRESS
-       fprintf('Wrote gstats for swc %d of %d...\n', i, length(swcs));
+    for j = 1:length(sholl)
+        fprintf(csvFile, '%d', sholl(j));
+        fprintf(csvFile, ',');
     end
-end
+    fprintf(csvFile, '\r\n');
+    stats = [];
+    trees = [];
+
 
 fclose(csvFile);
 fprintf('All finished!\n');
