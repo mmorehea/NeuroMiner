@@ -81,8 +81,8 @@ names_somadend = pickle.load(open('names/names_list_somadend.p', 'rb'))
 names = names_complete + names_somadend
 
 # TESTING-------------------------------------------------------------------
-testFirst = 12
-names = names[:testFirst]
+#testFirst = 12
+#names = names[:testFirst]
 # --------------------------------------------------------------------------
 
 names = np.array(names).transpose()
@@ -126,7 +126,9 @@ rows = []
 #     url = url_template.format(name=name)
 #
 #     grabFile(url, name)
-list_of_known_swcs = np.genfromtxt('./neuroData.csv', delimiter=',', usecols=1, dtype=str)
+list_of_known_swcs = []
+if os.path.exists('neuroData.csv'):
+    list_of_known_swcs = np.genfromtxt('./neuroData.csv', delimiter=',', usecols=1, dtype=str)
 
 
 for cell_number, name in enumerate(names):
@@ -135,11 +137,8 @@ for cell_number, name in enumerate(names):
     print "Mining " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
     url = url_template.format(name=name)
     rows = mine(url)
+    frame = pd.DataFrame(np.array(rows))
     if cell_number%500 == 0:
-        if os.path.exists('neuroData.csv'):
-            os.remove('neuroData.csv')
-        frame = pd.DataFrame(np.array(rows), index=names, columns=columns)
-        frame.to_csv('neuroData.csv')
+        frame.to_csv('neuroData' + str(cell_number) + '.csv')
 
-frame = pd.DataFrame(np.array(rows), index=names, columns=columns)
 frame.to_csv('neuroDataFinal.csv')
