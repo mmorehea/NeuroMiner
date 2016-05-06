@@ -13,6 +13,7 @@ import os
 import pickle
 import glob
 import string
+import shutil
 
 
 def mine(url):
@@ -29,6 +30,7 @@ def mine(url):
     k = pd.concat([b, d])
 
     vals = []
+    vals.append(url[23:])
     printable = set(string.printable)
     for column in columns:
         val = k.ix[column, 'Vals']
@@ -81,11 +83,13 @@ names_somadend = pickle.load(open('names/names_list_somadend.p', 'rb'))
 names = names_complete + names_somadend
 
 # TESTING-------------------------------------------------------------------
-#testFirst = 12
-#names = names[:testFirst]
+testFirst = 60
+names = names[:testFirst]
 # --------------------------------------------------------------------------
 
 names = np.array(names).transpose()
+
+total_cell_number = str(len(names))
 
 columns = []
 
@@ -110,35 +114,68 @@ columns += ["NeuroMorpho.Org ID", "Neuron Name", "Archive Name",
             "Average Bifurcation Angle Local",
             "Average Bifurcation Angle Remote", "Fractal Dimension"]
 
-existing_swcs = glob.glob('./swcs/*.swc')
-start_index = len(existing_swcs)
+choice = ''
+while choice.lower() != 'y' and choice.lower() != 'n': choice = raw_input('Do you want to grab any swcs? Choose no if you already have all of them. (y/n)')
+if choice.lower() == 'y': grabSwcs = True
+elif choice.lower() == 'n': grabSwcs = False
 
-total_cell_number = str(len(names))
+pleaseRun = False
+if grabSwcs:
+
+    walk = os.walk('./swcs/').next()
+
+    if len(walk[1]) > 0:
+    # This is for in case swcGrouper.py has been run, which modifies the directory structure
+        existing_swcs=[]
+        for dirr in walk[1]:
+            globby = glob.glob('./swcs/' + dirr + '/*.swc')
+            existing_swcs.extend(globby)
+            for each in globby:
+                shutil.move(each, './swcs')
+            os.rmdir('./swcs/' + dirr + '/')
+        pleaseRun = True
+
+    else:
+        existing_swcs = glob.glob('./swcs/*.swc')
+
+    start_index_swc = len(existing_swcs)
+
+    for cell_number, name in enumerate(names):
+        if cell_number < start_index_swc:
+            print 'Cell ' + str(cell_number + 1) + ' has already been grabbed.'
+            continue
+
+        url = url_template.format(name=name)
+        print "Grabbing " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
+        grabFile(url, name)
+
+#----------------------------------------------------------------------------------------------
+newFile = False
+if os.path.exists('neuroData.csv'):
+    existing_neuroData = pd.read_csv('neuroData.csv', index_col=0).index
+    start_index_neuroData = len(existing_neuroData)
+else:
+    start_index_neuroData = 0
+    newFile = True
+
 rows = []
 
-
-# for cell_number, name in enumerate(names):
-#     if cell_number < start_index:
-#         print 'Cell ' + str(cell_number + 1) + ' has already been grabbed.'
-#         continue
-#
-#     print "Getting " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
-#     url = url_template.format(name=name)
-#
-#     grabFile(url, name)
-list_of_known_swcs = []
-if os.path.exists('neuroData.csv'):
-    list_of_known_swcs = np.genfromtxt('./neuroData.csv', delimiter=',', usecols=1, dtype=str)
-
-
 for cell_number, name in enumerate(names):
-    if name in list_of_known_swcs:
-        print "skipping, already seen it"
+    if cell_number < start_index_neuroData:
+        print 'Cell ' + str(cell_number + 1) + ' has already been mined.'
+        continue
     print "Mining " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
     url = url_template.format(name=name)
     rows = mine(url)
-    frame = pd.DataFrame(np.array(rows))
-    if cell_number%500 == 0:
-        frame.to_csv('neuroData' + str(cell_number) + '.csv')
 
-frame.to_csv('neuroDataFinal.csv')
+if len(rows) > 0: 
+    frame = pd.DataFrame(np.array(rows)[:,1:], index=np.array(rows)[:,0], columns=columns)
+
+    if newFile:
+        frame.to_csv('neuroData.csv')
+    else:
+        with open('neuroData.csv', 'a') as fi:
+            frame.to_csv(fi, header=False)
+
+if pleaseRun:
+    print '\nPlease run swcGrouper.py again.'
