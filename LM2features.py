@@ -32,7 +32,7 @@ for i, name in enumerate(nameList):
 
 	newFrame.loc[i] = values
 
-newFrame.index = ['neuron_info.jsp?neuron_name=' + x[x.index('swcs/') + 5:-4] for x in nameList]
+newFrame.index = ['neuron_info.jsp?neuron_name=' + x[x.index(x.split('/')[-1]):-4] for x in nameList]
 
 tryAgain = True
 while tryAgain:
