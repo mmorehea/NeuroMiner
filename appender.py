@@ -12,8 +12,6 @@ import urllib2
 import os
 import pickle
 
-toMerge = []
-
 minedSet = pd.read_csv('neuroData.csv', index_col=0)
 
 lmSet = pd.read_csv('fixedLmResult.csv', index_col=0, encoding='UTF-8')
@@ -27,7 +25,7 @@ while len(toMerge) > 1:
 	right = toMerge[1]
 
 	merged = left.join(right, how='outer')
-	# Note: this will join the datasets using the union of the two keys of each dataframe.
+	# Note: this will join the datasets using the union of the two sets of keys of each dataframe.
 	# The keys (aka indices) are the neuron name url snippets. Therefore, to make sure that there are no differences between the sets of cells, scroll quickly through the result.
 	# If you see blocks of "NaN" or empty values, this means that there are some cells in one dataset that are not in another.
 
