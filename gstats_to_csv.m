@@ -1,11 +1,7 @@
 % Takes swcs and performs stats_tree, exports gstats to gstats.csv
 
-%=============================| OPTIONS |=================================%
-TREES_PATH      = '/home/mdm/code/TREES';      % path to your TREES toolbox directory
-PRINT_PROGRESS  = true;    % print progress indications to command window
-WRITE_HEADERS   = true;    % print column headers to csv
-%=========================================================================%
-
+% path to your TREES toolbox directory
+TREES_PATH = '/home/mdm/code/TREES';      
 
 addpath(genpath(TREES_PATH));
 start_trees;
