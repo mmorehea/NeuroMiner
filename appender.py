@@ -15,19 +15,20 @@ import pickle
 minedSet = pd.read_csv('neuroData.csv', index_col=0)
 
 lmSet = pd.read_csv('fixedLmResult.csv', index_col=0, encoding='UTF-8')
+lmSet = set(lmSet)
 
-#treeSet = pd.read_csv('gstats.csv', header=None, encoding='UTF-16')
+treeSet = pd.read_csv('gstats.csv', header=None, encoding='UTF-8')
 
-toMerge = [minedSet, lmSet]
+# This changes the index of treeSet to be the list of neuron names so that it will play nice with minedSet and lmSet:
+treeSet.index = ['neuron_info.jsp?neuron_name=' + x for x in treeSet[0]]
+
+toMerge = [minedSet, lmSet, treeSet]
 
 while len(toMerge) > 1:
 	left = toMerge[0]
 	right = toMerge[1]
 
-	merged = left.join(right, how='outer')
-	# Note: this will join the datasets using the union of the two sets of keys of each dataframe.
-	# The keys (aka indices) are the neuron name url snippets. Therefore, to make sure that there are no differences between the sets of cells, scroll quickly through the result.
-	# If you see blocks of "NaN" or empty values, this means that there are some cells in one dataset that are not in another.
+	merged = left.join(right, how='inner')
 
 	toMerge[0] = merged
 

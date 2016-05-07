@@ -54,9 +54,10 @@ def mine(url):
         val = filter(lambda x: x in printable, val)
 
         vals.append(val)
+
     rows.append(vals)
 
-    return rows
+    return 
 
 def grabFile(url, name):
 
@@ -83,8 +84,8 @@ names_somadend = pickle.load(open('names/names_list_somadend.p', 'rb'))
 names = names_complete + names_somadend
 
 # TESTING-------------------------------------------------------------------
-testFirst = 60
-names = names[:testFirst]
+#testFirst = 25
+#names = names[:testFirst]
 # --------------------------------------------------------------------------
 
 names = np.array(names).transpose()
@@ -114,13 +115,19 @@ columns += ["NeuroMorpho.Org ID", "Neuron Name", "Archive Name",
             "Average Bifurcation Angle Local",
             "Average Bifurcation Angle Remote", "Fractal Dimension"]
 
-choice = ''
-while choice.lower() != 'y' and choice.lower() != 'n': choice = raw_input('Do you want to grab any swcs? Choose no if you already have all of them. (y/n)')
-if choice.lower() == 'y': grabSwcs = True
-elif choice.lower() == 'n': grabSwcs = False
+choice = 'choice'
+grabbing = False; mining = False
+while choice not in '123': choice = raw_input("""What do you want to do?
+1. Both mine and grab the swcs.
+2. Only mine.
+3. Only grab swcs. 
+""")
+if choice == '1': grabbing = True; mining = True
+elif choice == '2': grabbing = False; mining = True
+elif choice == '3': grabbing = True; mining = False
 
 pleaseRun = False
-if grabSwcs:
+if grabbing:
 
     walk = os.walk('./swcs/').next()
 
@@ -147,35 +154,42 @@ if grabSwcs:
 
         url = url_template.format(name=name)
         print "Grabbing " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
+        
         grabFile(url, name)
 
 #----------------------------------------------------------------------------------------------
-newFile = False
-if os.path.exists('neuroData.csv'):
-    existing_neuroData = pd.read_csv('neuroData.csv', index_col=0).index
-    start_index_neuroData = len(existing_neuroData)
-else:
-    start_index_neuroData = 0
-    newFile = True
 
-rows = []
+if mining:
 
-for cell_number, name in enumerate(names):
-    if cell_number < start_index_neuroData:
-        print 'Cell ' + str(cell_number + 1) + ' has already been mined.'
-        continue
-    print "Mining " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
-    url = url_template.format(name=name)
-    rows = mine(url)
-
-if len(rows) > 0: 
-    frame = pd.DataFrame(np.array(rows)[:,1:], index=np.array(rows)[:,0], columns=columns)
-
-    if newFile:
-        frame.to_csv('neuroData.csv')
+    if os.path.exists('neuroData.csv'):
+        existing_neuroData = pd.read_csv('neuroData.csv', index_col=0).index
+        start_index_neuroData = len(existing_neuroData)
     else:
-        with open('neuroData.csv', 'a') as fi:
-            frame.to_csv(fi, header=False)
+        start_index_neuroData = 0
+
+    rows = []
+    save_every = 100 #change this to modify how often to save while mining
+    for cell_number, name in enumerate(names):
+
+        if cell_number < start_index_neuroData:
+            print 'Cell ' + str(cell_number + 1) + ' has already been mined.'
+            continue
+        print "Mining " + name + ', cell ' + str(cell_number + 1) + ' / ' + total_cell_number
+        url = url_template.format(name=name)
+        
+        mine(url)
+
+        if len(rows) % save_every == 0 or str(cell_number + 1) == total_cell_number:
+
+            frame = pd.DataFrame(np.array(rows)[:,1:], index=np.array(rows)[:,0], columns=columns)
+            if not os.path.exists('neuroData.csv'):
+                frame.to_csv('neuroData.csv')
+            else:
+                with open('neuroData.csv', 'a') as fi:
+                    frame.to_csv(fi, header=False)
+            rows = []
+            print '\n' + str(cell_number + 1) + ' cells have been saved.\n'
+
 
 if pleaseRun:
     print '\nPlease run swcGrouper.py again.'

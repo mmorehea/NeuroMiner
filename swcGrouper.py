@@ -38,7 +38,7 @@ while True:
 	print 'Processed '  + str(totalAdded) + ' files.'
 
 	if totalAdded % 1500 == 0:
-		name = str(totalAdded - 1499) + ' - ' + str(totalAdded) 
+		name = str(totalAdded - 1499) + '-' + str(totalAdded) 
 		os.mkdir('./swcs/' + name)
 		for f in directory:
 			shutil.move(f, './swcs/' + name)
