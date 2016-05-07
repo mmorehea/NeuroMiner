@@ -15,12 +15,13 @@ import pickle
 minedSet = pd.read_csv('neuroData.csv', index_col=0)
 
 lmSet = pd.read_csv('fixedLmResult.csv', index_col=0, encoding='UTF-8')
-lmSet = set(lmSet)
 
 treeSet = pd.read_csv('gstats.csv', header=None, encoding='UTF-8')
 
 # This changes the index of treeSet to be the list of neuron names so that it will play nice with minedSet and lmSet:
 treeSet.index = ['neuron_info.jsp?neuron_name=' + x for x in treeSet[0]]
+# This makes a slight change to treeSet's columns
+treeSet.columns = ['gstats ' + str(x) for x in xrange(66)]
 
 toMerge = [minedSet, lmSet, treeSet]
 
@@ -39,4 +40,4 @@ result = toMerge[0]
 if os.path.exists('appended.csv'):
     os.remove('appended.csv')
 
-result.to_csv('appended.csv')
+result.to_csv('appended.csv', index=False)
