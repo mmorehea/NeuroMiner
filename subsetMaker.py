@@ -1,4 +1,4 @@
-"""Make various subsets out of appended.csv, the output of appender.py"""
+"""Make various subsets out of appended.csv, the output of appender.py. Scroll down to main method for options."""
 # -*- coding: utf-8 -*-
 
 import numpy as np
@@ -12,283 +12,131 @@ import urllib2
 import os
 import pickle
 
-ogSet = pd.read_csv('appended.csv')
 
-totalRowNum = len(ogSet.index)
-
-s1 = False; s2 = False; s3 = False; s4 = False; s5 = False; s6 = False; s7 = False; s8 = False
-runWhich = 'runWhich'
-while runWhich not in '123456789': runWhich = raw_input("""\nWhich subset do you want to make? 
-
-1. Set with only the cells where ages are reported.
-
-2. Set with only the cells aged 1-18 days, mouse only (requires running option 1 first).
-
-3. Set with only the cells aged above 18 days, mouse only (requires running option 1 first).
-
-4. Set with only the pyramidal cells.
-
-5. Set with only stuff done by Jacobs.
-
-6. Set with only the ganglion cells.
-
-7. Set with only the granule cells.
-
-8. Set with only the cells from drosophila.
-
-9. Make them all.
-
-""")
-if runWhich == '1': s1 = True
-elif runWhich == '2': s2 = True
-elif runWhich == '3': s3 = True
-elif runWhich == '4': s4 = True
-elif runWhich == '5': s5 = True
-elif runWhich == '6': s6 = True
-elif runWhich == '7': s7 = True
-elif runWhich == '8': s8 = True
-elif runWhich == '9': s1 = True; s2 = True; s3 = True; s4 = True; s5 = True; s6 = True; s7 =True; s8 = True
+# Scroll down to main method for options.
 
 
-# 1. Set with only the cells where ages are reported.
-if s1: 
-	all_ages_reported_set = ogSet
-	for rowNum in xrange(len(ogSet.index)):
+def makeSubset(csv_path, new_subset_path, if_string):
+
+	data_set = pd.read_csv(csv_path)
+	totalRowNum = len(data_set.index)
+
+	if_string += '\n\tdata_set = data_set.drop(rowNum)\nprint \'\\nDropped row \' + str(rowNum + 1) + \'\\n\''
+
+	for rowNum in xrange(len(data_set.index)):
 		print 'Checking row ' + str(rowNum + 1) + '/' + str(totalRowNum)
+		exec(if_string)
 
-		if ogSet.ix[rowNum, 'Min Age'] == 'Not reported' or ogSet.ix[rowNum, 'Min Age'] == 0 or ogSet.ix[rowNum, 'Min Age'] == '0' \
-		or ogSet.ix[rowNum, 'Max Age'] == 'Not reported' or ogSet.ix[rowNum, 'Max Age'] == 0 or ogSet.ix[rowNum, 'Max Age'] == '0' \
-		or ogSet.ix[rowNum, 'Min Age'] == 0.0 or ogSet.ix[rowNum, 'Min Age'] == '0.0' \
-		or ogSet.ix[rowNum, 'Max Age'] == 0.0 or ogSet.ix[rowNum, 'Max Age'] == '0.0':
+	data_set.reset_index(drop=True, inplace=True)
+	if os.path.exists(new_subset_path):
+	    os.remove(new_subset_path)
 
-			all_ages_reported_set = all_ages_reported_set.drop(rowNum)
-			print '\nDropped row ' + str(rowNum + 1) + '\n'
+	data_set.to_csv(new_subset_path, index=False) 
 
-	all_ages_reported_set.reset_index(drop=True, inplace=True)
-	if os.path.exists('all_ages_reported.csv'):
-	    os.remove('all_ages_reported.csv')
 
-	all_ages_reported_set.to_csv('all_ages_reported.csv', index=False)
 
+def main():
+	# Uncomment Premade Subsets below as desired
+	# Parameters for makeSubset:
+	#	1. csv_path: the path to the data set from which the subset should be made
+	#	2. new_subset_path: the path where you want to make the new subset
+	#		Naming convention for new subsets (except for first 3): './subsets/uniqueName_' + filename of the set from which it's made 
+	#	3. if_string: the conditions under which particular cells will be dropped. Denote the original data set as 'data_set'.
 
-# 2. Set with only the cells aged 1-18 days, mouse only (requires running option 1 first).
-if s2:
-	only_1to18days_mouse_set = pd.read_csv('all_ages_reported.csv')
-	totalRowNum = len(only_1to18days_mouse_set.index)
 
-	for rowNum in xrange(len(only_1to18days_mouse_set.index)):
-		print 'Checking row ' + str(rowNum + 1) + '/' + str(totalRowNum)
+	# Generic template:
+	# makeSubset(csv_path, new_subset_path, if_string)
 
-		if int(only_1to18days_mouse_set.ix[rowNum, 'Min Age']) > 18 or int(only_1to18days_mouse_set.ix[rowNum, 'Max Age']) > 18 or only_1to18days_mouse_set.ix[rowNum, 'Species Name'].lower() != 'mouse':
-			only_1to18days_mouse_set = only_1to18days_mouse_set.drop(rowNum)
-			print '\nDropped row ' + str(rowNum + 1) + '\n' 
 
-	only_1to18days_mouse_set.reset_index(drop=True, inplace=True)
-	if os.path.exists('only_1to18days_mouse.csv'):
-	    os.remove('only_1to18days_mouse.csv')
+	# ---------------Premade Subsets---------------
+	# (if changing anything, better to copy/paste and leave these defaults alone)
 
-	only_1to18days_mouse_set.to_csv('only_1to18days_mouse.csv', index=False) 
+	# Contents:
 
+	# 1. Set with only the cells where ages are reported.
+	# 2. Set with only the cells aged 1-18 days (requires premade subset #1).
+	# 3. Set with only the cells aged above 18 days (requires premade subset #1).
 
-# 3. Set with only the cells aged above 18 days, mouse only (requires running option 1 first).
-if s3:
-	only_above18days_mouse_set = pd.read_csv('all_ages_reported.csv')
-	totalRowNum = len(only_above18days_mouse_set.index)
+	# 4. Set with only the cells from the Jacobs archive.
+	# 5. Set with only the pyramidal cells.
+	# 6. Set with only the ganglion cells.
+	# 7. Set with only the granule cells.
+	# 8. Set with only the drosophila cells.
 
-	for rowNum in xrange(len(only_above18days_mouse_set.index)):
-		print 'Checking row ' + str(rowNum + 1) + '/' + str(totalRowNum)
+	# 9. Set with only the mouse cells aged 1-18 days (requires premade subset #2). 
+	# 10. Set with only the mouse cells aged above 18 days (requires premade subset #3).
+	# 11. Set with only the rat cells aged 1-18 days (requires premade subset #2). 
+	# 12. Set with only the rat cells aged above 18 days (requires premade subset #3).
 
-		if int(only_above18days_mouse_set.ix[rowNum, 'Min Age']) < 18 or int(only_above18days_mouse_set.ix[rowNum, 'Max Age']) < 18 or only_above18days_mouse_set.ix[rowNum, 'Species Name'].lower() != 'mouse':
-			only_above18days_mouse_set = only_above18days_mouse_set.drop(rowNum)
-			print '\nDropped row ' + str(rowNum + 1) + '\n' 
+	# 13. Set with only the pyramidal cells above 18 days, mouse only, excluding the archives 
+	#     ['Brown', 'Buzsaki', 'DeFelipe', 'Flores', 'Hamad', 'Henckens', 'Lewis', 'Long', 'Svoboda'] 
+	#     (requires premade subset #10).
+	# 14. Set with only the pyramidal cells above 18 days, rat only, excluding the archives 
+	#     ['Brown', 'Buzsaki', 'DeFelipe', 'Flores', 'Gonzalez-Burgos', 'Hamad', 'Henckens', 'Lewis', 'Long', 'Svoboda']
+	#     (requires premade subset #12).
+	# 15. Same as 13 but aged 1 to 18 days (requires premade subset #10).
+	# 16. Same as 14 but aged 1 to 18 days (requires premade subset #12). 
 
-	only_above18days_mouse_set.reset_index(drop=True, inplace=True)
-	if os.path.exists('only_above18days_mouse.csv'):
-	    os.remove('only_above18days_mouse.csv')
+	try:
+		
+		# 1.  
+		# makeSubset('appended.csv', './subsets/all_ages_reported.csv', 'if data_set.ix[rowNum, \'Min Age\'] == \'Not reported\' or data_set.ix[rowNum, \'Min Age\'] == 0 or data_set.ix[rowNum, \'Min Age\'] == \'0\' or data_set.ix[rowNum, \'Max Age\'] == \'Not reported\' or data_set.ix[rowNum, \'Max Age\'] == 0 or data_set.ix[rowNum, \'Max Age\'] == \'0\' or data_set.ix[rowNum, \'Min Age\'] == 0.0 or data_set.ix[rowNum, \'Min Age\'] == \'0.0\' or data_set.ix[rowNum, \'Max Age\'] == 0.0 or data_set.ix[rowNum, \'Max Age\'] == \'0.0\':')
 
-	only_above18days_mouse_set.to_csv('only_above18days_mouse.csv', index=False)
+		# 2. 
+		# makeSubset('./subsets/all_ages_reported.csv', './subsets/1to18days.csv', 'if int(data_set.ix[rowNum, \'Min Age\']) > 18 or int(data_set.ix[rowNum, \'Max Age\']) > 18:')
 
+		# 3. 
+		# makeSubset('./subsets/all_ages_reported.csv', './subsets/above18days.csv', 'if int(data_set.ix[rowNum, \'Min Age\']) < 18 or int(data_set.ix[rowNum, \'Max Age\']) < 18:')
 
-# 4. Set with only the pyramidal cells.
-if s4:
+		# 4. 
+		# makeSubset('appended.csv', './subsets/jacobs_appended.csv', 'if \'jacobs\' not in data_set.ix[rowNum, \'Archive Name\'].lower():')
 
-	choice = 'choice'
-	while choice not in '1234': choice = raw_input("""\nMake the pyramidal cell set a subset of which dataset? 
-	
-1. The original set.
-	
-2. The set with only the cells where ages are reported (requires running option 1 in main menu first).
+		# 5. 
+		# makeSubset('appended.csv', './subsets/pyramidal_appended.csv', 'if \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
 
-3. The set with only the cells aged 1-18 days, mouse only (requires running options 1 and 2 in main menu first).
+		# 6. 
+		# makeSubset('appended.csv', './subsets/ganglion_appended.csv', 'if \'ganglion\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
 
-4. The set with only the cells aged above 18 days, mouse only (requires running options 1 and 3 in main menu first).
-	
-""")
+		# 7.
+		# makeSubset('appended.csv', './subsets/granule_appended.csv', 'if \'granule\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
 
-	if choice == '1': only_pyramidal_set = ogSet
-	elif choice == '2': only_pyramidal_set = pd.read_csv('all_ages_reported.csv')
-	elif choice == '3': only_pyramidal_set = pd.read_csv('only_1to18days_mouse.csv')
-	elif choice == '4': only_pyramidal_set = pd.read_csv('only_above18days_mouse.csv')
+		# 8.
+		# makeSubset('appended.csv', './subsets/drosophila_appended.csv', 'if \'drosophila\' not in data_set.ix[rowNum, \'Species Name\'].lower():')
 
-	totalRowNum = len(only_pyramidal_set.index)
+		# 9.
+		# makeSubset('./subsets/1to18days.csv', './subsets/mouse_1to18days.csv', 'if \'mouse\' not in data_set.ix[rowNum, \'Species Name\'].lower():')
 
-	for rowNum in xrange(len(only_pyramidal_set.index)):
-		print 'Checking row ' + str(rowNum + 1) + '/' + str(totalRowNum)
+		# 10.
+		# makeSubset('./subsets/above18days.csv', './subsets/mouse_above18days.csv', 'if \'mouse\' not in data_set.ix[rowNum, \'Species Name\'].lower():')
 
-		if 'pyramidal' not in only_pyramidal_set.ix[rowNum, 'Secondary Cell Class'].lower():
-			only_pyramidal_set = only_pyramidal_set.drop(rowNum)
-			print '\nDropped row ' + str(rowNum + 1) + '\n' 
+		# 11.
+		# makeSubset('./subsets/1to18days.csv', './subsets/rat_1to18days.csv', 'if \'rat\' not in data_set.ix[rowNum, \'Species Name\'].lower():')
 
-	only_pyramidal_set.reset_index(drop=True, inplace=True)
-	if os.path.exists('only_pyramidal.csv'):
-	    os.remove('only_pyramidal.csv')
+		# 12.
+		# makeSubset('./subsets/above18days.csv', './subsets/rat_above18days.csv', 'if \'rat\' not in data_set.ix[rowNum, \'Species Name\'].lower():')
 
-	only_pyramidal_set.to_csv('only_pyramidal.csv', index=False)
+		# 13.
+		#makeSubset('./subsets/mouse_above18days.csv', './subsets/excludeArchiveList_pyramidal_mouse_above18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
 
+		# 14.
+		#makeSubset('./subsets/rat_above18days.csv', './subsets/excludeArchiveList_pyramidal_rat_above18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Gonzalez-Burgos\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
 
-# 5. Set with only stuff done by Jacobs.
-if s5:
+		# 15.
+		makeSubset('./subsets/mouse_1to18days.csv', './subsets/excludeArchiveList_pyramidal_mouse_1to18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
 
-	choice = 'choice'
-	while choice not in '1234': choice = raw_input("""\nMake the Jacobs set a subset of which dataset? 
-	
-1. The original set.
-	
-2. The set with only the cells where ages are reported (requires running option 1 in main menu first).
+		# 16.
+		makeSubset('./subsets/rat_1to18days.csv', './subsets/excludeArchiveList_pyramidal_rat_1to18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Gonzalez-Burgos\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
 
-3. The set with only the cells aged 1-18 days, mouse only (requires running options 1 and 2 in main menu first).
 
-4. The set with only the cells aged above 18 days, mouse only (requires running options 1 and 3 in main menu first).
-	
-""")
 
-	if choice == '1': only_jacobs_set = ogSet
-	elif choice == '2': only_jacobs_set = pd.read_csv('all_ages_reported.csv')
-	elif choice == '3': only_jacobs_set = pd.read_csv('only_1to18days_mouse.csv')
-	elif choice == '4': only_jacobs_set = pd.read_csv('only_above18days_mouse.csv')
 
-	totalRowNum = len(only_jacobs_set.index)
+		print '\nFor options, please go to the main method of this script.\n'
+	except:
+		print 'Could not find one or more of the required precursors for making the subsets. Please check the main method and try again.'
 
-	for rowNum in xrange(len(only_jacobs_set.index)):
-		print 'Checking row ' + str(rowNum + 1) + '/' + str(totalRowNum)
 
-		if 'jacobs' not in only_jacobs_set.ix[rowNum, 'Archive Name'].lower():
-			only_jacobs_set = only_jacobs_set.drop(rowNum)
-			print '\nDropped row ' + str(rowNum + 1) + '\n' 
+# check for strings ko and tko - these are the knockouts we prolly don't want them
 
-	only_jacobs_set.reset_index(drop=True, inplace=True)
-	if os.path.exists('only_jacobs.csv'):
-	    os.remove('only_jacobs.csv')
 
-	only_jacobs_set.to_csv('only_jacobs.csv', index=False)
-
-
-# 6. Set with only the ganglion cells.
-if s6:
-
-	choice = 'choice'
-	while choice not in '1234': choice = raw_input("""\nMake the ganglion cell set a subset of which dataset? 
-	
-1. The original set.
-	
-2. The set with only the cells where ages are reported (requires running option 1 in main menu first).
-
-3. The set with only the cells aged 1-18 days, mouse only (requires running options 1 and 2 in main menu first).
-
-4. The set with only the cells aged above 18 days, mouse only (requires running options 1 and 3 in main menu first).
-	
-""")
-
-	if choice == '1': only_ganglion_set = ogSet
-	elif choice == '2': only_ganglion_set = pd.read_csv('all_ages_reported.csv')
-	elif choice == '3': only_ganglion_set = pd.read_csv('only_1to18days_mouse.csv')
-	elif choice == '4': only_ganglion_set = pd.read_csv('only_above18days_mouse.csv')
-
-	totalRowNum = len(only_ganglion_set.index)
-
-	for rowNum in xrange(len(only_ganglion_set.index)):
-		print 'Checking row ' + str(rowNum + 1) + '/' + str(totalRowNum)
-
-		if 'ganglion' not in only_ganglion_set.ix[rowNum, 'Secondary Cell Class'].lower():
-			only_ganglion_set = only_ganglion_set.drop(rowNum)
-			print '\nDropped row ' + str(rowNum + 1) + '\n' 
-
-	only_ganglion_set.reset_index(drop=True, inplace=True)
-	if os.path.exists('only_ganglion.csv'):
-	    os.remove('only_ganglion.csv')
-
-	only_ganglion_set.to_csv('only_ganglion.csv', index=False)
-
-
-# 7. Set with only the granule cells.
-if s7:
-
-	choice = 'choice'
-	while choice not in '1234': choice = raw_input("""\nMake the granule cell set a subset of which dataset? 
-	
-1. The original set.
-	
-2. The set with only the cells where ages are reported (requires running option 1 in main menu first).
-
-3. The set with only the cells aged 1-18 days, mouse only (requires running options 1 and 2 in main menu first).
-
-4. The set with only the cells aged above 18 days, mouse only (requires running options 1 and 3 in main menu first).
-	
-""")
-
-	if choice == '1': only_granule_set = ogSet
-	elif choice == '2': only_granule_set = pd.read_csv('all_ages_reported.csv')
-	elif choice == '3': only_granule_set = pd.read_csv('only_1to18days_mouse.csv')
-	elif choice == '4': only_granule_set = pd.read_csv('only_above18days_mouse.csv')
-
-	totalRowNum = len(only_granule_set.index)
-
-	for rowNum in xrange(len(only_granule_set.index)):
-		print 'Checking row ' + str(rowNum + 1) + '/' + str(totalRowNum)
-
-		if 'granule' not in only_granule_set.ix[rowNum, 'Secondary Cell Class'].lower():
-			only_granule_set = only_granule_set.drop(rowNum)
-			print '\nDropped row ' + str(rowNum + 1) + '\n' 
-
-	only_granule_set.reset_index(drop=True, inplace=True)
-	if os.path.exists('only_granule.csv'):
-	    os.remove('only_granule.csv')
-
-	only_granule_set.to_csv('only_granule.csv', index=False)
-
-
-# 8. Set with only the cells from drosophila.
-if s8:
-
-	choice = 'choice'
-	while choice not in '1234': choice = raw_input("""\nMake the drosophila cell set a subset of which dataset? 
-	
-1. The original set.
-	
-2. The set with only the cells where ages are reported (requires running option 1 in main menu first).
-
-3. The set with only the cells aged 1-18 days, mouse only (requires running options 1 and 2 in main menu first).
-
-4. The set with only the cells aged above 18 days, mouse only (requires running options 1 and 3 in main menu first).
-	
-""")
-
-	if choice == '1': only_drosophila_set = ogSet
-	elif choice == '2': only_drosophila_set = pd.read_csv('all_ages_reported.csv')
-	elif choice == '3': only_drosophila_set = pd.read_csv('only_1to18days_mouse.csv')
-	elif choice == '4': only_drosophila_set = pd.read_csv('only_above18days_mouse.csv')
-
-	totalRowNum = len(only_drosophila_set.index)
-
-	for rowNum in xrange(len(only_drosophila_set.index)):
-		print 'Checking row ' + str(rowNum + 1) + '/' + str(totalRowNum)
-
-		if 'drosophila' not in only_drosophila_set.ix[rowNum, 'Species Name'].lower():
-			only_drosophila_set = only_drosophila_set.drop(rowNum)
-			print '\nDropped row ' + str(rowNum + 1) + '\n' 
-
-	only_drosophila_set.reset_index(drop=True, inplace=True)
-	if os.path.exists('only_drosophila.csv'):
-	    os.remove('only_drosophila.csv')
-
-	only_drosophila_set.to_csv('only_drosophila.csv', index=False)
+if __name__ == "__main__":
+	main()
