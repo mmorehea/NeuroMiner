@@ -1,6 +1,6 @@
 library(randomForest)
 
-read.csv("../subsets/pyramidal_appended.csv",T)->x
+read.csv("../first_subsets/pyramidal_appended.csv",T)->x
 nx1<-33:96
 nx2<-97:161
 ny<-4
@@ -33,10 +33,3 @@ cols=rainbow(length(unique(dat[,1]))+2)
 matplot(g3$err.rate,lwd=2,col=cols,lty=1,type="l")
 ##MAP cols to dimnames(g$err.rate)[[2]]
 varImpPlot(g3)
-
-
-
-
-
-
-
