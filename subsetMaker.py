@@ -36,7 +36,9 @@ def makeSubset(csv_path, new_subset_path, if_string):
 
 
 def main():
-	# Uncomment Premade Subsets below as desired
+	parameterList = []
+
+
 	# Parameters for makeSubset:
 	#	1. csv_path: the path to the data set from which the subset should be made
 	#	2. new_subset_path: the path where you want to make the new subset
@@ -44,92 +46,58 @@ def main():
 	#	3. if_string: the conditions under which particular cells will be dropped. Denote the original data set as 'data_set'.
 
 
-	# Generic template:
-	# makeSubset(csv_path, new_subset_path, if_string)
-
-
-	# ---------------Premade Subsets---------------
-	# (if changing anything, better to copy/paste and leave these defaults alone)
-
-	# Contents:
-
 	# 1. Set with only the cells where ages are reported.
-	# 2. Set with only the cells aged 1-18 days (requires premade subset #1).
-	# 3. Set with only the cells aged above 18 days (requires premade subset #1).
+	parameterList.append(('NeuronDataMaster.csv', './subsets/all_ages_reported.csv', 'if data_set.ix[rowNum, \'Min Age\'] == \'Not reported\' or data_set.ix[rowNum, \'Min Age\'] == 0 or data_set.ix[rowNum, \'Min Age\'] == \'0\' or data_set.ix[rowNum, \'Max Age\'] == \'Not reported\' or data_set.ix[rowNum, \'Max Age\'] == 0 or data_set.ix[rowNum, \'Max Age\'] == \'0\' or data_set.ix[rowNum, \'Min Age\'] == 0.0 or data_set.ix[rowNum, \'Min Age\'] == \'0.0\' or data_set.ix[rowNum, \'Max Age\'] == 0.0 or data_set.ix[rowNum, \'Max Age\'] == \'0.0\':'))
+
+	# 2. Set with only the cells aged 1-18 days (requires #1).
+	parameterList.append(('./subsets/all_ages_reported.csv', './subsets/1to18days.csv', 'if int(data_set.ix[rowNum, \'Min Age\']) > 18 or int(data_set.ix[rowNum, \'Max Age\']) > 18:'))
+
+	# 3. Set with only the cells aged above 18 days (requires #1).
+	parameterList.append(('./subsets/all_ages_reported.csv', './subsets/above18days.csv', 'if int(data_set.ix[rowNum, \'Min Age\']) < 18 or int(data_set.ix[rowNum, \'Max Age\']) < 18:'))
 
 	# 4. Set with only the cells from the Jacobs archive.
+	parameterList.append(('NeuronDataMaster.csv', './subsets/jacobs_NeuronDataMaster.csv', 'if \'jacobs\' not in data_set.ix[rowNum, \'Archive Name\'].lower():'))
+
 	# 5. Set with only the pyramidal cells.
+	parameterList.append(('NeuronDataMaster.csv', './subsets/pyramidal_NeuronDataMaster.csv', 'if \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))
+
 	# 6. Set with only the ganglion cells.
+	parameterList.append(('NeuronDataMaster.csv', './subsets/ganglion_NeuronDataMaster.csv', 'if \'ganglion\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))
+
 	# 7. Set with only the granule cells.
+	parameterList.append(('NeuronDataMaster.csv', './subsets/granule_NeuronDataMaster.csv', 'if \'granule\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))
+
 	# 8. Set with only the drosophila cells.
+	parameterList.append(('NeuronDataMaster.csv', './subsets/drosophila_NeuronDataMaster.csv', 'if \'drosophila\' not in data_set.ix[rowNum, \'Species Name\'].lower():'))
 
-	# 9. Set with only the mouse cells aged 1-18 days (requires premade subset #2). 
-	# 10. Set with only the mouse cells aged above 18 days (requires premade subset #3).
-	# 11. Set with only the rat cells aged 1-18 days (requires premade subset #2). 
-	# 12. Set with only the rat cells aged above 18 days (requires premade subset #3).
+	# 9. Set with only the mouse cells aged 1-18 days (requires #2).
+	parameterList.append(('./subsets/1to18days.csv', './subsets/mouse_1to18days.csv', 'if \'mouse\' not in data_set.ix[rowNum, \'Species Name\'].lower():'))
 
-	# 13. Set with only the pyramidal cells above 18 days, mouse only, excluding the archives 
-	#     ['Brown', 'Buzsaki', 'DeFelipe', 'Flores', 'Hamad', 'Henckens', 'Lewis', 'Long', 'Svoboda'] 
-	#     (requires premade subset #10).
-	# 14. Set with only the pyramidal cells above 18 days, rat only, excluding the archives 
-	#     ['Brown', 'Buzsaki', 'DeFelipe', 'Flores', 'Gonzalez-Burgos', 'Hamad', 'Henckens', 'Lewis', 'Long', 'Svoboda']
-	#     (requires premade subset #12).
-	# 15. Same as 13 but aged 1 to 18 days (requires premade subset #10).
-	# 16. Same as 14 but aged 1 to 18 days (requires premade subset #12). 
+	# 10. Set with only the mouse cells aged above 18 days (requires #3).
+	parameterList.append(('./subsets/above18days.csv', './subsets/mouse_above18days.csv', 'if \'mouse\' not in data_set.ix[rowNum, \'Species Name\'].lower():'))
+
+	# 11. Set with only the rat cells aged 1-18 days (requires #2).
+	parameterList.append(('./subsets/1to18days.csv', './subsets/rat_1to18days.csv', 'if \'rat\' not in data_set.ix[rowNum, \'Species Name\'].lower():'))
+
+	# 12. Set with only the rat cells aged above 18 days (requires #3).
+	parameterList.append(('./subsets/above18days.csv', './subsets/rat_above18days.csv', 'if \'rat\' not in data_set.ix[rowNum, \'Species Name\'].lower():'))
+
+	# 13. Set with only the pyramidal cells above 18 days, mouse only, excluding the archives #     ['Brown', 'Buzsaki', 'DeFelipe', 'Flores', 'Hamad', 'Henckens', 'Lewis', 'Long', 'Svoboda'] #     (requires #10).
+	parameterList.append(('./subsets/mouse_above18days.csv', './subsets/excludeArchiveList_pyramidal_mouse_above18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))
+
+	# 14. Set with only the pyramidal cells above 18 days, rat only, excluding the archives #     ['Brown', 'Buzsaki', 'DeFelipe', 'Flores', 'Gonzalez-Burgos', 'Hamad', 'Henckens', 'Lewis', 'Long', 'Svoboda']#     (requires #12).
+	parameterList.append(('./subsets/rat_above18days.csv', './subsets/excludeArchiveList_pyramidal_rat_above18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Gonzalez-Burgos\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))
+
+	# 15. Same as 13 but aged 1 to 18 days (requires #10).
+	parameterList.append(('./subsets/mouse_1to18days.csv', './subsets/excludeArchiveList_pyramidal_mouse_1to18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))
+
+	# 16. Same as 14 but aged 1 to 18 days (requires #12).
+	parameterList.append(('./subsets/rat_1to18days.csv', './subsets/excludeArchiveList_pyramidal_rat_1to18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Gonzalez-Burgos\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))List:
+	
 
 	try:
-		
-		# 1.  
-		# makeSubset('appended.csv', './subsets/all_ages_reported.csv', 'if data_set.ix[rowNum, \'Min Age\'] == \'Not reported\' or data_set.ix[rowNum, \'Min Age\'] == 0 or data_set.ix[rowNum, \'Min Age\'] == \'0\' or data_set.ix[rowNum, \'Max Age\'] == \'Not reported\' or data_set.ix[rowNum, \'Max Age\'] == 0 or data_set.ix[rowNum, \'Max Age\'] == \'0\' or data_set.ix[rowNum, \'Min Age\'] == 0.0 or data_set.ix[rowNum, \'Min Age\'] == \'0.0\' or data_set.ix[rowNum, \'Max Age\'] == 0.0 or data_set.ix[rowNum, \'Max Age\'] == \'0.0\':')
-
-		# 2. 
-		# makeSubset('./subsets/all_ages_reported.csv', './subsets/1to18days.csv', 'if int(data_set.ix[rowNum, \'Min Age\']) > 18 or int(data_set.ix[rowNum, \'Max Age\']) > 18:')
-
-		# 3. 
-		# makeSubset('./subsets/all_ages_reported.csv', './subsets/above18days.csv', 'if int(data_set.ix[rowNum, \'Min Age\']) < 18 or int(data_set.ix[rowNum, \'Max Age\']) < 18:')
-
-		# 4. 
-		# makeSubset('appended.csv', './subsets/jacobs_appended.csv', 'if \'jacobs\' not in data_set.ix[rowNum, \'Archive Name\'].lower():')
-
-		# 5. 
-		# makeSubset('appended.csv', './subsets/pyramidal_appended.csv', 'if \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
-
-		# 6. 
-		# makeSubset('appended.csv', './subsets/ganglion_appended.csv', 'if \'ganglion\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
-
-		# 7.
-		# makeSubset('appended.csv', './subsets/granule_appended.csv', 'if \'granule\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
-
-		# 8.
-		# makeSubset('appended.csv', './subsets/drosophila_appended.csv', 'if \'drosophila\' not in data_set.ix[rowNum, \'Species Name\'].lower():')
-
-		# 9.
-		# makeSubset('./subsets/1to18days.csv', './subsets/mouse_1to18days.csv', 'if \'mouse\' not in data_set.ix[rowNum, \'Species Name\'].lower():')
-
-		# 10.
-		# makeSubset('./subsets/above18days.csv', './subsets/mouse_above18days.csv', 'if \'mouse\' not in data_set.ix[rowNum, \'Species Name\'].lower():')
-
-		# 11.
-		# makeSubset('./subsets/1to18days.csv', './subsets/rat_1to18days.csv', 'if \'rat\' not in data_set.ix[rowNum, \'Species Name\'].lower():')
-
-		# 12.
-		# makeSubset('./subsets/above18days.csv', './subsets/rat_above18days.csv', 'if \'rat\' not in data_set.ix[rowNum, \'Species Name\'].lower():')
-
-		# 13.
-		#makeSubset('./subsets/mouse_above18days.csv', './subsets/excludeArchiveList_pyramidal_mouse_above18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
-
-		# 14.
-		#makeSubset('./subsets/rat_above18days.csv', './subsets/excludeArchiveList_pyramidal_rat_above18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Gonzalez-Burgos\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
-
-		# 15.
-		makeSubset('./subsets/mouse_1to18days.csv', './subsets/excludeArchiveList_pyramidal_mouse_1to18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
-
-		# 16.
-		makeSubset('./subsets/rat_1to18days.csv', './subsets/excludeArchiveList_pyramidal_rat_1to18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Gonzalez-Burgos\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():')
-
-
-
-
+		for each in parameterList:
+			makeSubset(each[0], each[1], each[2])
 		print '\nFor options, please go to the main method of this script.\n'
 	except:
 		print 'Could not find one or more of the required precursors for making the subsets. Please check the main method and try again.'
