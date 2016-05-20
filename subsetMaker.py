@@ -92,7 +92,7 @@ def main():
 	parameterList.append(('./subsets/mouse_1to18days.csv', './subsets/excludeArchiveList_pyramidal_mouse_1to18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))
 
 	# 16. Same as 14 but aged 1 to 18 days (requires #12).
-	parameterList.append(('./subsets/rat_1to18days.csv', './subsets/excludeArchiveList_pyramidal_rat_1to18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Gonzalez-Burgos\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))List:
+	parameterList.append(('./subsets/rat_1to18days.csv', './subsets/excludeArchiveList_pyramidal_rat_1to18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Gonzalez-Burgos\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))
 	
 
 	try:
