@@ -26,30 +26,36 @@ nxx3<-81:dim(dat)[2] #80 is Sholl.1 should always be 1
 
 #which(dat[,80:128]<1,arr.ind=T)
 #dat[dat[,80:128]<1]
+print.err<-function(rfor,subj)
+{
+  last<-end(rfor$err.rate)[1]
+  mains<-paste(subj, ", OOB=",round(mean(rfor$err.rate[last,1]),3))
+  matplot(rfor$err.rate,lwd=2,col=cols,lty=1,type="l",main=mains)
+  legend("bottomright",inset=.05,legend=colnames(rfor$err.rate),
+         cex=.7,col=cols,lty=1,lwd=3)
+  ##MAP cols to dimnames(g$err.rate)[[2]]
+  varImpPlot(rfor, main=subj)
+}
+cols=rainbow(length(unique(dat[,1]))+2)
 
 
 set.seed(100)
 g1<-randomForest(y~.,data=dat[,c(1,nxx1)])##,prox=TRUE)
-cols=rainbow(length(unique(dat[,1]))+2)
-last<-end(g1$err.rate)[1]
-mains<-paste("L-measure, OOB=",round(mean(g1$err.rate[last,1]),3))
-matplot(g1$err.rate,lwd=2,col=cols,lty=1,type="l",main=mains)
-legend("bottomright",inset=.05,legend=colnames(g1$err.rate),
-       cex=.7,col=cols,lty=1,lwd=3)
-##MAP cols to dimnames(g$err.rate)[[2]]
-varImpPlot(g1, main=mains)
+print.err(g1,"L-measure")
 
 
 set.seed(100)
 g2<-randomForest(y~.,data=dat[,c(1,nxx2)])##,prox=TRUE)
-cols=rainbow(length(unique(dat[,1]))+2)
-last<-end(g2$err.rate)[1]
-mains<-paste("Gstat, OOB=",round(mean(g2$err.rate[last,1]),3))
-matplot(g2$err.rate,lwd=2,col=cols,lty=1,type="l",main=mains)
-legend("bottomright",inset=.05,legend=colnames(g2$err.rate),
-       cex=.7,col=cols,lty=1,lwd=3)
-##MAP cols to dimnames(g$err.rate)[[2]]
-varImpPlot(g2,main=mains)
+print.err(g2,"Gstat")
+
+set.seed(100)
+g3<-randomForest(y~.,data=dat[,c(1,nxx3)])##,prox=TRUE)
+print.err(g3,"Sholl")
+
+set.seed(100)
+gtot<-randomForest(y~.,data=dat)##,prox=TRUE)
+print.err(gtot,"All")
+
 
 ## -rat
 nrow(dat[dat$y=="rat",])
@@ -68,26 +74,13 @@ legend("bottomright",inset=.05,legend=colnames(g2rat$err.rate),
 varImpPlot(g2rat,main=mains)
 
 
-set.seed(100)
-g3<-randomForest(y~.,data=dat[,c(1,nxx3)])##,prox=TRUE)
-cols=rainbow(length(unique(dat[,1]))+2)
-last<-end(g3$err.rate)[1]
-mains<-paste("Sholl , OOB=",round(mean(g3$err.rate[last,1]),3))
-matplot(g3$err.rate,lwd=2,col=cols,lty=1,type="l",main=mains)
-legend("bottomright",inset=.05,legend=colnames(g3$err.rate),
-       cex=.7,col=cols,lty=1,lwd=3)
-##MAP cols to dimnames(g$err.rate)[[2]]
-varImpPlot(g3,main=mains)
 
 
-set.seed(100)
-gtot<-randomForest(y~.,data=dat)##,prox=TRUE)
-cols=rainbow(length(unique(dat[,1]))+2)
-last<-end(gtot$err.rate)[1]
-mains<-paste("All , OOB=",round(mean(gtot$err.rate[last,1]),3))
-matplot(gtot$err.rate,lwd=2,col=cols,lty=1,type="l",main=mains)
-leg<-legend("bottomright",inset=.05,legend=colnames(gtot$err.rate),
-       cex=.7,col=cols,lty=1,lwd =3)
 
-##MAP cols to dimnames(g$err.rate)[[2]]
-trash<-varImpPlot(gtot)
+
+
+
+####removing species with less than 100 samples
+#nrow(dat[dat$y=="rat",])
+#dat2<-dat[dat$y!="rat",]
+#dat2[,1]<-droplevels(dat2[,1])
