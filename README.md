@@ -23,3 +23,5 @@ LM.jar can effectively handle only 1500 files at a time. Therefore, run swcGroup
 
 #R things todo
 split nx2 into schull and gstat
+
+test

@@ -48,7 +48,7 @@ g2<-randomForest(y~.,data=temp1[,c(1,nxx2)])##,prox=TRUE)
 print.err(g2,"Gstat","NeuronDataMaster")
 save.err(g2,"Gstat",names(myfiles[1]))
 
-set.seed(100)
+cdset.seed(100)
 g3<-randomForest(y~.,data=temp1[,c(1,nxx3)])##,prox=TRUE)
 print.err(g3,"Sholl","NeuronDataMaster")
 save.err(g3,"Sholl",names(myfiles[1]))
