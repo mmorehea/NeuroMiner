@@ -109,17 +109,16 @@ g1<-randomForest(y~.,data=dat[,c(1,nxx1)])##,prox=TRUE)
 set.seed(020) ##so RF gets same result as in paper
 
 gpls<-nipal(as.matrix(dat[,c(nxx1)]),as.numeric(dat$y),20)
+grf<-randomForest(y~.,data=dat[,c(1,nxx1)])
+vpls<-vip(gpls,as.numeric(dat$y),names(dat[,c(nxx1)]))
+
+
 x<-as.matrix(dat[,c(nxx1)])
 y<-as.numeric(dat$y)
-
 gpls<-nipal(x,y,40)
 grf<-randomForest(y~.,data=data.frame(y=as.factor(y),x))
-#grf<-randomForest(y~.,data=dat[,c(1,nxx1)])
-
-
 vrf<-varImpPlot(grf)
- vpls<-vip(gpls,y,names(x))
-#vpls<-vip(gpls,as.numeric(dat$y),names(dat[,c(nxx1)]))
+vpls<-vip(gpls,y,names(x))
 
 vrf<-scale(vrf)
 vpls<-scale(vpls)
