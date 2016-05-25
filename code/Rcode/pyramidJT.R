@@ -13,6 +13,12 @@ names(myfiles)<-temp
 
 #########
 #### fxns 
+mkdirs <- function(fp) {
+  if(!file.exists(fp)) {
+    mkdirs(dirname(fp))
+    dir.create(fp)
+  }
+}
 
 # loads a csv into a data.frame and cleans data
 process.csv<-function(x)
@@ -49,10 +55,13 @@ save.err<-function(rfor,subj,fname)
 {
   last<-end(rfor$err.rate)[1]
   mains<-paste(subj, ", OOB=",round(mean(rfor$err.rate[last,1]),3))
+  loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
+  mkdirs(loc)
   
   #   png(filename=paste(subj, substr(fname,1,nchar(fname)-4), "1.png"), units="px", width=1024, 
   #       height=768, pointsize=12, res=72)
-  pdf(file=paste(subj, substr(fname,1,nchar(fname)-4), "1.pdf"), width=11, 
+ 
+  pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "1.pdf"), width=11, 
       height=8.5, pointsize=12)
   matplot(rfor$err.rate,lwd=2,col=cols,lty=1,type="l",main=mains,
           sub=fname, cex.sub=.7)
@@ -66,7 +75,7 @@ save.err<-function(rfor,subj,fname)
   ##MAP cols to dimnames(g$err.rate)[[2]]
   #   png(filename=paste(subj,substr(fname,1,nchar(fname)-4), "2.png"), units="px", width=1024, 
   #       height=768, pointsize=12, res=144)
-  pdf(file=paste(subj, substr(fname,1,nchar(fname)-4), "2.pdf"), width=11, 
+  pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "2.pdf"), width=11, 
       height=8.5, pointsize=12)
   varImpPlot(rfor, main=subj,sub=fname,cex.sub=.7)
   dev.off()
@@ -87,6 +96,29 @@ PLSvRF<-function(vrf,vpls,subj,fname,dat)
   points(vpls[indpls],vrf[indpls],pch=16,cex=2,col="white")
   text(vpls[indpls],vrf[indpls],row.names(vpls)[indpls],col=gray(0.3))
   abline(0,1)
+}
+
+save.PLSvRF<-function(vrf,vpls,subj,fname,dat)
+{
+  loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
+  mkdirs(loc)
+  pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "PLSvRF.pdf"), width=11, 
+      height=8.5, pointsize=12)
+  
+  vrf<-scale(vrf)
+  vpls<-scale(vpls)
+  plot(vpls,vrf,main=subj,sub=fname,cex.sub=.7,
+       ylab="RF (Variable Score)",xlab="PLS (Variable Score)",pch=16,cex.sub=0.8)
+  #x<-as.matrix(dat[,c(nxx1)])
+  x<-as.matrix(dat[,])
+  indpls<-order(vpls)[dim(x)[2]:(dim(x)[2]-4)]
+  indrf<-order(vrf)[dim(x)[2]:(dim(x)[2]-4)]
+  points(vpls[indrf],vrf[indrf],pch=16,cex=2,col="white")
+  text(vpls[indrf],vrf[indrf],row.names(vrf)[indrf],col=gray(0.6))
+  points(vpls[indpls],vrf[indpls],pch=16,cex=2,col="white")
+  text(vpls[indpls],vrf[indpls],row.names(vpls)[indpls],col=gray(0.3))
+  abline(0,1)
+  dev.off()
 }
 
 nipal<-function(x,y,k){
@@ -160,6 +192,7 @@ ftime[2]<-proc.time()[3]-ptm;names(ftime)[2]<-("L-measure pls")
 save.err(g1rf,"L-measure",names(myfiles[1]))
 v1rf<-varImpPlot(g1rf)
 PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[1]),temp1[,c(nxx1)])
+save.PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[1]),temp1[,c(nxx1)])
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -176,6 +209,7 @@ ftime[4]<-proc.time()[3]-ptm;names(ftime)[4]<-("gstat pls")
 save.err(g2rf,"Gstat",names(myfiles[1]))
 v2rf<-varImpPlot(g2rf)
 PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[1]),temp1[,c(nxx2)])
+save.PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[1]),temp1[,c(nxx2)])
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -191,6 +225,7 @@ ftime[6]<-proc.time()[3]-ptm;names(ftime)[6]<-("sholl pls")
 save.err(g3rf,"Sholl",names(myfiles[1]))
 v3rf<-varImpPlot(g3rf)
 PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[1]),temp1[,c(nxx3)])
+save.PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[1]),temp1[,c(nxx3)])
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -207,6 +242,7 @@ ftime[8]<-proc.time()[3]-ptm;names(ftime)[8]<-("all pls")
 save.err(gtotrf,"All",names(myfiles[1]))
 vtotrf<-varImpPlot(gtotrf)
 PLSvRF(vtotrf,vtotpls,"ALL",names(myfiles[1]),temp1[,c(nxx1,nxx2,nxx3)])
+save.PLSvRF(vtotrf,vtotpls,"ALL",names(myfiles[1]),temp1[,c(nxx1,nxx2,nxx3)])
 
 
 OOB=round(mean(gtotrf$err.rate[last,1])
