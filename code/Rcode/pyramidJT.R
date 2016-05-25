@@ -1,8 +1,6 @@
 library(randomForest)
 library(calibrate)
-setwd("~/NeuroMiner/Rcode")
-#read.csv("../first_subsets/pyramidal_appended.csv",T)->dump
-read.csv("../NeuronDataMaster.csv",T)->x
+
 
 
 
@@ -121,7 +119,8 @@ save.PLSvRF<-function(vrf,vpls,subj,fname,dat)
   dev.off()
 }
 
-nipal<-function(x,y,k){
+nipal<-function(x,y,k)
+{
   x<-scale(x,,scale=FALSE)
   y<-scale(y,,scale=FALSE)
   b<-p<-a<-u<-NULL
@@ -147,7 +146,8 @@ nipal<-function(x,y,k){
   return(structure(list(b=b,p=p,a=a,u=u,d=ab,q=k),class="upls"))
 }
 
-vip<-function(obj,y,nm=NULL){
+vip<-function(obj,y,nm=NULL)
+{
   if(class(obj)!="upls"){
     stop("Object is not of type upls")
   }
@@ -252,6 +252,17 @@ OOB=round(mean(gtotrf$err.rate[last,1])
 
 
 
+###
+###
+####
+old code
+###
+###
+
+setwd("~/NeuroMiner/data_sets")
+#read.csv("../first_subsets/pyramidal_appended.csv",T)->dump
+read.csv("NeuronDataMaster.csv",T)->x
+
 # kilb data showed erro in the Sholl values, these rows are deleted
 #x<-x[x$Archive.Name!="Kilb",]
 x<-x[x$Archive.Name!="McQuiston",]
@@ -284,7 +295,7 @@ cols=rainbow(length(unique(dat[,1]))+2)
 set.seed(100)
 g1<-randomForest(y~.,data=dat[,c(1,nxx1)])##,prox=TRUE)
 print.err(g1,"L-measure","NeuronDataMaster")
-
+save.err(g1,"L-measure","NeuronDataMaster")
 
 set.seed(100)
 g2<-randomForest(y~.,data=dat[,c(1,nxx2)])##,prox=TRUE)
