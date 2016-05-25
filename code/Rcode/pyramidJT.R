@@ -163,13 +163,18 @@ vip<-function(obj,y,nm=NULL)
 
 ##############
 #####batch processing
+for (i in c(1,2))
+{
+
 
 nx1<-33:96
 nx2<-97:110
 nx3<-111:159
 ny<-4
 
-temp1<-process.csv(myfiles[[1]])
+#temp1<-process.csv(myfiles[[1]])
+temp1<-process.csv(myfiles[[i]])
+
 
 nxx1<-2:65
 nxx2<-66:79
@@ -188,11 +193,11 @@ g1pls<-nipal(as.matrix(temp1[,c(nxx1)]),as.numeric(temp1$y),40)
 v1pls<-vip(g1pls,as.numeric(temp1$y),names(temp1[,c(nxx1)]))
 ftime[2]<-proc.time()[3]-ptm;names(ftime)[2]<-("L-measure pls")
 
-#print.err(g1rf,"L-measure",names(myfiles[1]))
-save.err(g1rf,"L-measure",names(myfiles[1]))
+print.err(g1rf,"L-measure",names(myfiles[i]))
+save.err(g1rf,"L-measure",names(myfiles[i]))
 v1rf<-varImpPlot(g1rf)
-PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[1]),temp1[,c(nxx1)])
-save.PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[1]),temp1[,c(nxx1)])
+PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)])
+save.PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)])
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -206,10 +211,10 @@ v2pls<-vip(g2pls,as.numeric(temp1$y),names(temp1[,c(nxx2)]))
 ftime[4]<-proc.time()[3]-ptm;names(ftime)[4]<-("gstat pls")
 
 #print.err(g2,"Gstat","NeuronDataMaster")
-save.err(g2rf,"Gstat",names(myfiles[1]))
+save.err(g2rf,"Gstat",names(myfiles[i]))
 v2rf<-varImpPlot(g2rf)
-PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[1]),temp1[,c(nxx2)])
-save.PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[1]),temp1[,c(nxx2)])
+PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[i]),temp1[,c(nxx2)])
+save.PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[i]),temp1[,c(nxx2)])
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -222,10 +227,10 @@ g3pls<-nipal(as.matrix(temp1[,c(nxx3)]),as.numeric(temp1$y),40)
 v3pls<-vip(g3pls,as.numeric(temp1$y),names(temp1[,c(nxx3)]))
 ftime[6]<-proc.time()[3]-ptm;names(ftime)[6]<-("sholl pls")
 #print.err(g3,"Sholl","NeuronDataMaster")
-save.err(g3rf,"Sholl",names(myfiles[1]))
+save.err(g3rf,"Sholl",names(myfiles[i]))
 v3rf<-varImpPlot(g3rf)
-PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[1]),temp1[,c(nxx3)])
-save.PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[1]),temp1[,c(nxx3)])
+PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[i]),temp1[,c(nxx3)])
+save.PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[i]),temp1[,c(nxx3)])
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -239,11 +244,11 @@ vtotpls<-vip(gtotpls,as.numeric(temp1$y),names(temp1[,c(nxx1,nxx2,nxx3)]))
 ftime[8]<-proc.time()[3]-ptm;names(ftime)[8]<-("all pls")
 
 #print.err(gtot,"All","NeuronDataMaster")
-save.err(gtotrf,"All",names(myfiles[1]))
+save.err(gtotrf,"All",names(myfiles[i]))
 vtotrf<-varImpPlot(gtotrf)
-PLSvRF(vtotrf,vtotpls,"ALL",names(myfiles[1]),temp1[,c(nxx1,nxx2,nxx3)])
-save.PLSvRF(vtotrf,vtotpls,"ALL",names(myfiles[1]),temp1[,c(nxx1,nxx2,nxx3)])
-
+PLSvRF(vtotrf,vtotpls,"ALL",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
+save.PLSvRF(vtotrf,vtotpls,"ALL",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
+}
 
 OOB=round(mean(gtotrf$err.rate[last,1])
 ######end batch
@@ -328,7 +333,40 @@ varImpPlot(g2rat,main=mains)
 
 
 
+#######
+#color testing
 
+bartemp<-c(5,7,6,4,8)
+ctemp<-rainbow(5)
+ctemp[1:5]<-c("#990000FF","#BB0000FF","#996600FF","#BB6600FF","#EE6600FF")
+ctemp<-cm.colors(7)
+
+
+###more sophisticate way
+low<-c("blowfly","C. elegans","drosophila melanogaster",
+          "moth","spiny lobster")
+medium<-c("chicken","frog","goldfish","guinea pig","manatee",
+          "mouse","pouched lamprey","proechimys","rabbit",
+          "rat","salamander","zebrafish")
+high<-c("bottlenose dolphin","cat","chimpanzee","clouded leopard",
+        "domestic pig","elephant","giraffe","human","humpback whale",
+        "minke whale","monkey","sheep","siberian tiger")
+pal<-colorRampPalette(c("rosybrown4","red4"))
+ctemp<-pal(5)
+ctemp<-pal(length(medium))
+barplot(bartemp,col=ctemp)
+
+
+
+value<-c(2, 4, 5, 8, 2, 3, 1)
+tf<-levels(dat[,1])%in%low
+tf<-c(FALSE,tf,FALSE)
+
+cols<-with(cols,ifelse(tf,paste(pal(length(low)),"FF",sep=""), cols))
+
+df<-data.frame(cols, tf)
+
+df$cols <- with(df, ifelse(tf,paste(pal(length(low)),"FF",sep=""), cols))
 
 
 
