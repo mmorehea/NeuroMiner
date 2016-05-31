@@ -1,7 +1,9 @@
 library(randomForest)
 library(calibrate)
 
-
+setwd("~/NeuroMiner/data_sets")
+#read.csv("../first_subsets/pyramidal_appended.csv",T)->dump
+read.csv("NeuronDataMaster.csv",T)->colmaster
 
 
 setwd("~/NeuroMiner/data_sets/Neuron_subsets")
@@ -20,7 +22,17 @@ mkdirs <- function(fp) {
 
 # loads a csv into a data.frame and cleans data
 process.csv<-function(x)
-{
+{ 
+  ####testing code
+  ##x<-(myfiles[[i]])
+  
+  ### check for number of species in a dataset
+  ###   if dataset contains only 1 species
+  ###   the categorical variable is set to the
+  ###   primary brain region
+  if (nlevels(as.factor(x[,ny]))==1){ny<-15}
+  
+  ### cleaning the dataset
   x<-x[x$Archive.Name!="McQuiston",]
   dat<-data.frame(y=as.factor(x[,ny]),x[,c(nx1,nx2,nx3)])
   dat<-na.omit(dat)
@@ -30,6 +42,39 @@ process.csv<-function(x)
   return(dat)  
 }  
 
+parsecolors<-function(cols)
+{
+  makecolors<-function(x)
+  {
+     # x<-low
+    ctemp<-paste(pal(length(x)),"FF",sep="")
+    ###working
+    #tf<-levels(dat[,1])%in%x
+    #test
+    tf<-levels(temp1[,1])%in%x
+    tf<-c(FALSE,tf,FALSE)
+    cols[tf]<-ctemp
+    return(cols)
+  }
+  low<-c("blowfly","C. elegans","drosophila melanogaster",
+         "moth","spiny lobster")
+  medium<-c("chicken","frog","goldfish","guinea pig","manatee",
+            "mouse","pouched lamprey","proechimys","rabbit",
+            "rat","salamander","zebrafish")
+  high<-c("bottlenose dolphin","cat","chimpanzee","clouded leopard",
+          "domestic pig","elephant","giraffe","human","humpback whale",
+          "minke whale","monkey","sheep","Siberian tiger")
+  
+  pal<-colorRampPalette(c("rosybrown4","red3"))
+  cols<-makecolors(low)
+  pal<-colorRampPalette(c("grey","blue"))
+  cols<-makecolors(medium)
+  #pal<-colorRampPalette(c("black","chartreuse"))
+  #pal<-colorRampPalette(c("black","chartreuse","black"))
+  pal<-colorRampPalette(c("darkgreen","green","palegreen"))
+  cols<-makecolors(high)
+  return(cols)
+}
 # prints to screen
 print.err<-function(rfor,subj,fname)
 {
@@ -163,14 +208,25 @@ vip<-function(obj,y,nm=NULL)
 
 ##############
 #####batch processing
-for (i in c(1,2))
-{
-
-
 nx1<-33:96
 nx2<-97:110
 nx3<-111:159
+###try
+#ny<-15
+###original
 ny<-4
+#coldat<-process.csv(colmaster)
+#cols=rainbow(length(unique(temp1[,1]))+2)
+#cols=parsecolors(cols)
+
+
+z=1:18
+#z[-c(4,5,6,7,8,12,13,15,16)]
+#z[-c(4)]
+### for the time being we omit drosphilia, its a small dataset n=18
+for (i in z[-c(4,5,6,7,8,12,13,15,16)])
+{
+
 
 #temp1<-process.csv(myfiles[[1]])
 temp1<-process.csv(myfiles[[i]])
@@ -181,6 +237,8 @@ nxx2<-66:79
 nxx3<-81:dim(temp1)[2] #80 is Sholl.1 should always be 1
 
 cols=rainbow(length(unique(temp1[,1]))+2)
+cols=parsecolors(cols)
+
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -235,7 +293,7 @@ save.PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[i]),temp1[,c(nxx3)])
 ptm<-proc.time()[3]
 set.seed(100)
 gtotrf<-randomForest(y~.,data=temp1[,c(1,nxx1,nxx2,nxx3)])##,prox=TRUE)
-ftime[7]<-proc.time()[3]-ptm;names(ftime)[7]<-("all forest")
+ftime[7]<-proc.time()[3]-ptm;names(ftime)[7]<-("All forest")
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -246,8 +304,8 @@ ftime[8]<-proc.time()[3]-ptm;names(ftime)[8]<-("all pls")
 #print.err(gtot,"All","NeuronDataMaster")
 save.err(gtotrf,"All",names(myfiles[i]))
 vtotrf<-varImpPlot(gtotrf)
-PLSvRF(vtotrf,vtotpls,"ALL",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
-save.PLSvRF(vtotrf,vtotpls,"ALL",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
+PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
+save.PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
 }
 
 OOB=round(mean(gtotrf$err.rate[last,1])
@@ -343,6 +401,7 @@ ctemp<-cm.colors(7)
 
 
 ###more sophisticate way
+
 low<-c("blowfly","C. elegans","drosophila melanogaster",
           "moth","spiny lobster")
 medium<-c("chicken","frog","goldfish","guinea pig","manatee",
@@ -352,21 +411,54 @@ high<-c("bottlenose dolphin","cat","chimpanzee","clouded leopard",
         "domestic pig","elephant","giraffe","human","humpback whale",
         "minke whale","monkey","sheep","siberian tiger")
 pal<-colorRampPalette(c("rosybrown4","red4"))
+i<-length(medium)
+set.seed(100)
+bartemp<-runif(i,1,5)
 ctemp<-pal(5)
-ctemp<-pal(length(medium))
+ctemp<-pal(length(low))
 barplot(bartemp,col=ctemp)
 
 
 
-value<-c(2, 4, 5, 8, 2, 3, 1)
-tf<-levels(dat[,1])%in%low
-tf<-c(FALSE,tf,FALSE)
+#value<-c(2, 4, 5, 8, 2, 3, 1)
 
-cols<-with(cols,ifelse(tf,paste(pal(length(low)),"FF",sep=""), cols))
+
+cols=rainbow(length(unique(dat[,1]))+2)
+makecolors<-function(x)
+{
+#  x<-high
+  ctemp<-paste(pal(length(x)),"FF",sep="")
+  tf<-levels(dat[,1])%in%x
+  tf<-c(FALSE,tf,FALSE)
+  cols[tf]<-ctemp
+  return(cols)
+}
+low<-c("blowfly","C. elegans","drosophila melanogaster",
+       "moth","spiny lobster")
+medium<-c("chicken","frog","goldfish","guinea pig","manatee",
+          "mouse","pouched lamprey","proechimys","rabbit",
+          "rat","salamander","zebrafish")
+high<-c("bottlenose dolphin","cat","chimpanzee","clouded leopard",
+        "domestic pig","elephant","giraffe","human","humpback whale",
+        "minke whale","monkey","sheep","Siberian tiger")
+
+pal<-colorRampPalette(c("rosybrown4","red3"))
+cols<-makecolors(low)
+pal<-colorRampPalette(c("grey","blue"))
+cols<-makecolors(medium)
+#pal<-colorRampPalette(c("black","chartreuse"))
+#pal<-colorRampPalette(c("black","chartreuse","black"))
+pal<-colorRampPalette(c("darkgreen","green","palegreen"))
+cols<-makecolors(high)
+
+i<-length(cols)
+set.seed(100)
+bartemp<-runif(i,1,5)
+barplot(bartemp,col=cols)
+
+
 
 df<-data.frame(cols, tf)
-
-df$cols <- with(df, ifelse(tf,paste(pal(length(low)),"FF",sep=""), cols))
 
 
 
