@@ -14,6 +14,8 @@ import pickle
 import glob
 import shutil
 
+os.chdir('..'); os.chdir('..')
+
 path = './swcs/*.swc'
 swcs = glob.iglob(path)
 

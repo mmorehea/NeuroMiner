@@ -12,6 +12,9 @@ import urllib2
 import os
 import pickle
 
+os.chdir('..'); os.chdir('..')
+os.chdir('./data_sets/raw')
+
 minedSet = pd.read_csv('neuroData.csv', index_col=0)
 
 lmSet = pd.read_csv('fixedLmResult.csv', index_col=0, encoding='UTF-8')
@@ -36,6 +39,8 @@ while len(toMerge) > 1:
 	del toMerge[1]
 
 result = toMerge[0]
+
+os.chdir('..')
 
 if os.path.exists('appended.csv'):
     os.remove('appended.csv')

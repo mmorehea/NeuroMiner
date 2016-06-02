@@ -76,11 +76,13 @@ def grabFile(url, name):
 
     return
 
+os.chdir('..'); os.chdir('..')
+
 url_template = 'http://neuromorpho.org/{name}'
 
 names = []
-names_complete = pickle.load(open('names/names_list.p', 'rb'))
-names_somadend = pickle.load(open('names/names_list_somadend.p', 'rb'))
+names_complete = pickle.load(open('./prior/names/names_list.p', 'rb'))
+names_somadend = pickle.load(open('./prior/names/names_list_somadend.p', 'rb'))
 names = names_complete + names_somadend
 
 # TESTING-------------------------------------------------------------------
@@ -158,7 +160,7 @@ if grabbing:
         grabFile(url, name)
 
 #----------------------------------------------------------------------------------------------
-
+os.chdir('./data_sets/raw/')
 if mining:
 
     if os.path.exists('neuroData.csv'):
