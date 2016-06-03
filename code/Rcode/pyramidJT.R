@@ -223,77 +223,77 @@ vip<-function(obj,y,nm=NULL)
   return(a1)##sort(a1,decreasing=TRUE))
 }
 
-print_table<-function(somedooky)
+save.IMP<-function(fname)
 {
-  options(digits = 4)
-  set.seed(123)
-  x = matrix(rnorm(40), 5)
-  dimnames(x) = list(NULL, head(LETTERS, ncol(x)))
-  knitr::kable(x, digits = 2, caption = "A table produced by printr.")
+  loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
+  mkdirs(loc)
+  pdf(file=paste(loc, substr(fname,1,nchar(fname)-4), "VARIMP.pdf"), width=11, 
+      height=8.5, pointsize=12,bg="transparent")
   
-  options(digits = 4)
-  set.seed(123)
-  x = matrix(rnorm(40), 5)
+  
+#  texfile <- paste(loc,substr(fname,1,nchar(fname)-4),'.pdf',sep="")
   cnames<-c("rf","rf","rf","rf","rf",
             "pls","pls","pls","pls","pls")
   colnames(varimp)<-cnames
-  knitr::kable(varimp,  caption = "A table produced by printr.")
+  #knitr::kable(varimp,  caption = "A table produced by printr.")
   
   
   
   
+ par(mfrow=c(2,1))   
+ textplot( xtable(varimp[-1,1:5]))
+ textplot(xtable(varimp[-1,6:10]))
+ 
+ dev.off()
   
-  xtable(varimp)
+#   tt <- print(xtable(varimp[-1,]), type='latex')
+#   
+#   print(xtable(varimp[-1,]), type='latex')
+#   
+#   texfile <- paste(loc,substr(fname,1,nchar(fname)-4),'.tex',sep="")
+#   cat(
+#     '\\documentclass[12pt]{report}
+#       \\usepackage[landscape]{geometry}
+#       \\date{}
+#       \\begin{document}', tt, '\\end{document}', sep='', 
+#     file=texfile
+#   )
+#   ## pdflatex from texlive package for linux converts .tex to .pdf
+#   
+#   tools::texi2dvi(texfile, pdf = TRUE, clean = TRUE)
+#   tools::texi2pdf(texfile,  clean = TRUE)
   
-  tt <- print(xtable(varimp[-1,]), type='latex')
   
-  
-  texfile <- paste(loc,substr(fname,1,nchar(fname)-4),'.tex',sep="")
-  cat(
-    '\\documentclass[12pt]{report}
-      \\usepackage[landscape]{geometry}
-      \\date{}
-      \\begin{document}', tt, '\\end{document}', sep='', 
-    file=texfile
-  )
-  ## pdflatex from texlive package for linux converts .tex to .pdf
-  
-  tools::texi2dvi(texfile, pdf = TRUE, clean = TRUE)
-  tools::texi2pdf(texfile,  clean = TRUE)
-  
-  
-  system(paste0('pdflatex ', '-output-directory ./reports ', texfile))
 
   
   
-  
-  # show R version information
-  textplot(version)
-  # show the alphabet as a single string
-  textplot( paste(letters[1:26], collapse=" ") )
-  
-  # show the alphabet as a matrix 
-  textplot( matrix(letters[1:26], ncol=2))
-  
-  ### Make a nice 4 way display with two plots and two text summaries 
-  data(iris)  
-  par(mfrow=c(2,2))   
-  plot( Sepal.Length ~ Species, data=iris, border="blue", col="cyan",   
-        main="Boxplot of Sepal Length by Species" )    
-  plotmeans(Sepal.Length ~ Species, data=iris, barwidth=2, connect=FALSE,
-            main="Means and 95\% Confidence Intervals\nof Sepal Length by Species")
-  
-  info <- sapply(split(iris$Sepal.Length, iris$Species),
-                 function(x) round(c(Mean=mean(x), SD=sd(x), N=gdata::nobs(x)),2))
-  
-  textplot( info, valign="top"  )
-  title("Sepal Length by Species")
-  
-  reg <- lm( Sepal.Length ~ Species, data=iris )
-  textplot( capture.output(summary(reg)), valign="top")
-  title("Regression of Sepal Length by Species")
-  
-  par(mfrow=c(1,1))
+#   # show R version information
+#   textplot(version)
+#   # show the alphabet as a single string
+#   textplot( paste(letters[1:26], collapse=" ") )
+#   
+#   # show the alphabet as a matrix 
+#   textplot( matrix(letters[1:26], ncol=2))
+#   
+#   ### Make a nice 4 way display with two plots and two text summaries 
+#   data(iris)  
+#   par(mfrow=c(2,2))   
+#   plot( Sepal.Length ~ Species, data=iris, border="blue", col="cyan",   
+#         main="Boxplot of Sepal Length by Species" )    
+#   plotmeans(Sepal.Length ~ Species, data=iris, barwidth=2, connect=FALSE,
+#             main="Means and 95\% Confidence Intervals\nof Sepal Length by Species")
+#   
+#   info <- sapply(split(iris$Sepal.Length, iris$Species),
+#                  function(x) round(c(Mean=mean(x), SD=sd(x), N=gdata::nobs(x)),2))
+#   
+#   textplot( info, valign="top"  )
+#   title("Sepal Length by Species")
+#   
+#   reg <- lm( Sepal.Length ~ Species, data=iris )
+#   textplot( capture.output(summary(reg)), valign="top")
+#   title("Regression of Sepal Length by Species")
+#   
+#   par(mfrow=c(1,1))
 }
 
 ##############
@@ -317,9 +317,10 @@ z=1:18
 
 varimp<-array(NA,dim=c(1,10))
 
-for (i in 1)
+for (i in z[-c(4)])
 {
-i=1
+  varimp<-array(NA,dim=c(1,10))
+
 #temp1<-process.csv(myfiles[[1]])
 temp1<-process.csv(myfiles[[i]])
 
@@ -406,6 +407,9 @@ save.err(gtotrf,"All",names(myfiles[i]),counts)
 vtotrf<-varImpPlot(gtotrf)
 PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
 varimp<-save.PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
+
+save.IMP(names(myfiles[i]))
+
 }
 
 OOB=round(mean(gtotrf$err.rate[last,1])
