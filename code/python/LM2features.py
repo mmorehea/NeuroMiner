@@ -12,7 +12,9 @@ import urllib2
 import os
 import pickle
 
-f = raw_input('\nPlease enter the name of the output file from the LM tool you just ran: ')
+os.chdir('..'); os.chdir('..')
+
+f = raw_input('\n(Run Lm.jar first). Please enter the name of the output file from the LM tool you just ran: ')
 fromcsv = pd.read_csv('./lms/' + f, delimiter='\t', names=xrange(8), header=None)
 
 names = fromcsv.index

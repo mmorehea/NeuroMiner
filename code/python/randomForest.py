@@ -79,7 +79,7 @@ def rf(csv_path, test_size, y_name, y_name_excludeList, x_name_range, x_name_ran
 			with open('rfResults.txt', 'a') as output:
 				output.write(resultString)
 
-
+os.chdir('..'); os.chdir('..')
 def main():
 	# Important parameters that can be tweaked within the rf function:
 	# 	Cross validation settings
@@ -95,7 +95,7 @@ def main():
 	# This will allow you to check the value counts for your path and target column to see what you want to exclude.
 
 
-	rf('./subsets/excludeArchiveList_pyramidal_rat_above18days.csv', 0.4, 'Primary Brain Region', ['entorhinal cortex'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
+	rf('./data_sets/Neuron_subsets/excludeArchiveList_pyramidal_rat_above18days.csv', 0.4, 'Primary Brain Region', ['entorhinal cortex'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
 	# Parameters:
 	# 1. path to data set
 	# 2. test size
@@ -111,21 +111,21 @@ def main():
 	# 7. list of column names to exclude from scaling - probably don't need to change default: ['gstats ' + str(x) for x in xrange(66)]  
 
 
-	rf('./subsets/excludeArchiveList_pyramidal_rat_above18days.csv', 0.4, 'Archive Name', ['Lee_LJ', 'Kole', 'Brown', 'Rice-Baylor', 'Yuan', 'Claiborne', 'Barrionuevo', 'Bikson', 'Groen', 'Spruston', 'Dendritica', 'Helmstaedter', 'Markram', 'Johnston', 'Turner,Ascoli,Buzsaki', 'Barbour', 'Gonzalez-Burgos', 'Turner,Ascoli,Wittner,Buzsaki', 'Palmer', 'Bergstrom', 'Cauli'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
+	rf('./data_sets/Neuron_subsets/excludeArchiveList_pyramidal_rat_above18days.csv', 0.4, 'Archive Name', ['Lee_LJ', 'Kole', 'Brown', 'Rice-Baylor', 'Yuan', 'Claiborne', 'Barrionuevo', 'Bikson', 'Groen', 'Spruston', 'Dendritica', 'Helmstaedter', 'Markram', 'Johnston', 'Turner,Ascoli,Buzsaki', 'Barbour', 'Gonzalez-Burgos', 'Turner,Ascoli,Wittner,Buzsaki', 'Palmer', 'Bergstrom', 'Cauli'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
 
-	rf('./subsets/excludeArchiveList_pyramidal_mouse_above18days.csv', 0.4, 'Primary Brain Region', ['entorhinal cortex'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
+	rf('./data_sets/Neuron_subsets/excludeArchiveList_pyramidal_mouse_above18days.csv', 0.4, 'Primary Brain Region', ['entorhinal cortex'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
 
-	rf('./subsets/excludeArchiveList_pyramidal_mouse_above18days.csv', 0.25, 'Archive Name', ['Lee', 'Smit-Rigter', 'Kimura', 'Margrie', 'Korte', 'Soltesz', 'Wu', 'Cohen,Mizrahi', 'Anton', 'Calabresi', 'Gonzalez-Burgos', 'Prince', 'Bacci'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
+	rf('./data_sets/Neuron_subsets/excludeArchiveList_pyramidal_mouse_above18days.csv', 0.25, 'Archive Name', ['Lee', 'Smit-Rigter', 'Kimura', 'Margrie', 'Korte', 'Soltesz', 'Wu', 'Cohen,Mizrahi', 'Anton', 'Calabresi', 'Gonzalez-Burgos', 'Prince', 'Bacci'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
 
 
 
-	rf('./subsets/excludeArchiveList_pyramidal_rat_1to18days.csv', 0.4, 'Primary Brain Region', [], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
+	rf('./data_sets/Neuron_subsets/excludeArchiveList_pyramidal_rat_1to18days.csv', 0.4, 'Primary Brain Region', [], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
 
-	rf('./subsets/excludeArchiveList_pyramidal_rat_1to18days.csv', 0.4, 'Archive Name', ['Hay,Markram', 'Cauli'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
+	rf('./data_sets/Neuron_subsets/excludeArchiveList_pyramidal_rat_1to18days.csv', 0.4, 'Archive Name', ['Hay,Markram', 'Cauli'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
 
-	rf('./subsets/excludeArchiveList_pyramidal_mouse_1to18days.csv', 0.4, 'Primary Brain Region', [], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
+	rf('./data_sets/Neuron_subsets/excludeArchiveList_pyramidal_mouse_1to18days.csv', 0.4, 'Primary Brain Region', [], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
 
-	rf('./subsets/excludeArchiveList_pyramidal_mouse_1to18days.csv', 0.25, 'Archive Name', ['Tagawa', 'Smit-Rigter', 'Krieger', 'Anton', 'Poorthuis', 'Heistek_Mansvelder'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
+	rf('./data_sets/Neuron_subsets/excludeArchiveList_pyramidal_mouse_1to18days.csv', 0.25, 'Archive Name', ['Tagawa', 'Smit-Rigter', 'Krieger', 'Anton', 'Poorthuis', 'Heistek_Mansvelder'], ('Soma Surface', 'gstats 63'), ['gstats 0'], ['gstats ' + str(x) for x in xrange(66)])
 
 
 if __name__ == "__main__":
