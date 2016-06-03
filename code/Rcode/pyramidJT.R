@@ -1,6 +1,8 @@
 library(randomForest)
 library(calibrate)
-
+library(gplots)
+library(plyr)
+library(xtable)
 setwd("~/NeuroMiner/data_sets")
 #read.csv("../first_subsets/pyramidal_appended.csv",T)->dump
 read.csv("NeuronDataMaster.csv",T)->colmaster
@@ -94,7 +96,7 @@ print.err<-function(rfor,subj,fname)
 }
 
 # prints to pdf
-save.err<-function(rfor,subj,fname)
+save.err<-function(rfor,subj,fname,counts)
 {
   last<-end(rfor$err.rate)[1]
   mains<-paste(subj, ", OOB=",round(mean(rfor$err.rate[last,1]),3))
@@ -106,13 +108,14 @@ save.err<-function(rfor,subj,fname)
  
   pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "1.pdf"), width=11, 
       height=8.5, pointsize=12)
-  matplot(rfor$err.rate,lwd=2,col=cols,lty=1,type="l",main=mains,
+  matplot(rfor$err.rate,lwd=2,col=cols,lty=c(1,2,4,6),type="l",main=mains,
           sub=fname, cex.sub=.7)
   #label err rates at 100
   hund<-rep(100,dim(rfor$err.rate)[2])
   textxy(hund,rfor$err.rate[100,],round(rfor$err.rate[100,],2), cex=1.2)
-  legend("bottomright",inset=.05,legend=colnames(rfor$err.rate),
-         cex=1,col=cols,lty=1,lwd=3,bg="white")
+  lname<-paste(colnames(rfor$err.rate),"   n=",counts)
+  legend("bottomright",inset=.05,legend=lname,
+         cex=1,col=cols,lty=c(1,2,4,6),lwd=2,bg="white")
   dev.off()
   
   ##MAP cols to dimnames(g$err.rate)[[2]]
@@ -120,7 +123,7 @@ save.err<-function(rfor,subj,fname)
   #       height=768, pointsize=12, res=144)
   pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "2.pdf"), width=11, 
       height=8.5, pointsize=12)
-  varImpPlot(rfor, main=subj,sub=fname,cex.sub=.7)
+  varImpPlot(rfor, main=subj,sub=fname,cex.sub=.7,bg="transparent")
   dev.off()
 }
 
@@ -143,17 +146,24 @@ PLSvRF<-function(vrf,vpls,subj,fname,dat)
 
 save.PLSvRF<-function(vrf,vpls,subj,fname,dat)
 {
+#   v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)]
+#   vrf<-v1rf
+#   vpls<-v1pls;subj<-"L-measure"
+#   fname<-names(myfiles[i]);dat<-temp1[,c(nxx1)]
+#   
   loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
   mkdirs(loc)
   pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "PLSvRF.pdf"), width=11, 
-      height=8.5, pointsize=12)
+      height=8.5, pointsize=12,bg="transparent")
   
   vrf<-scale(vrf)
   vpls<-scale(vpls)
   plot(vpls,vrf,main=subj,sub=fname,cex.sub=.7,
-       ylab="RF (Variable Score)",xlab="PLS (Variable Score)",pch=16,cex.sub=0.8)
+       ylab="RF (Variable Score)",xlab="PLS (Variable Score)",
+       pch=16,cex.sub=0.8,bg="transparent")
   #x<-as.matrix(dat[,c(nxx1)])
   x<-as.matrix(dat[,])
+  
   indpls<-order(vpls)[dim(x)[2]:(dim(x)[2]-4)]
   indrf<-order(vrf)[dim(x)[2]:(dim(x)[2]-4)]
   points(vpls[indrf],vrf[indrf],pch=16,cex=2,col="white")
@@ -162,6 +172,13 @@ save.PLSvRF<-function(vrf,vpls,subj,fname,dat)
   text(vpls[indpls],vrf[indpls],row.names(vpls)[indpls],col=gray(0.3))
   abline(0,1)
   dev.off()
+
+  
+  varimp<-rbind(varimp,c(row.names(vrf)[indrf],
+                         row.names(vpls)[indpls]))
+  row.names(varimp)[nrow(varimp)]<-paste(substr(fname,1,nchar(fname)-4),subj)
+  
+  return(varimp)
 }
 
 nipal<-function(x,y,k)
@@ -206,6 +223,79 @@ vip<-function(obj,y,nm=NULL)
   return(a1)##sort(a1,decreasing=TRUE))
 }
 
+print_table<-function(somedooky)
+{
+  options(digits = 4)
+  set.seed(123)
+  x = matrix(rnorm(40), 5)
+  dimnames(x) = list(NULL, head(LETTERS, ncol(x)))
+  knitr::kable(x, digits = 2, caption = "A table produced by printr.")
+  
+  options(digits = 4)
+  set.seed(123)
+  x = matrix(rnorm(40), 5)
+  cnames<-c("rf","rf","rf","rf","rf",
+            "pls","pls","pls","pls","pls")
+  colnames(varimp)<-cnames
+  knitr::kable(varimp,  caption = "A table produced by printr.")
+  
+  
+  
+  
+  
+  xtable(varimp)
+  
+  tt <- print(xtable(varimp[-1,]), type='latex')
+  
+  
+  texfile <- paste(loc,substr(fname,1,nchar(fname)-4),'.tex',sep="")
+  cat(
+    '\\documentclass[12pt]{report}
+      \\usepackage[landscape]{geometry}
+      \\date{}
+      \\begin{document}', tt, '\\end{document}', sep='', 
+    file=texfile
+  )
+  ## pdflatex from texlive package for linux converts .tex to .pdf
+  
+  tools::texi2dvi(texfile, pdf = TRUE, clean = TRUE)
+  tools::texi2pdf(texfile,  clean = TRUE)
+  
+  
+  system(paste0('pdflatex ', '-output-directory ./reports ', texfile))
+
+  
+  
+  
+  # show R version information
+  textplot(version)
+  # show the alphabet as a single string
+  textplot( paste(letters[1:26], collapse=" ") )
+  
+  # show the alphabet as a matrix 
+  textplot( matrix(letters[1:26], ncol=2))
+  
+  ### Make a nice 4 way display with two plots and two text summaries 
+  data(iris)  
+  par(mfrow=c(2,2))   
+  plot( Sepal.Length ~ Species, data=iris, border="blue", col="cyan",   
+        main="Boxplot of Sepal Length by Species" )    
+  plotmeans(Sepal.Length ~ Species, data=iris, barwidth=2, connect=FALSE,
+            main="Means and 95\% Confidence Intervals\nof Sepal Length by Species")
+  
+  info <- sapply(split(iris$Sepal.Length, iris$Species),
+                 function(x) round(c(Mean=mean(x), SD=sd(x), N=gdata::nobs(x)),2))
+  
+  textplot( info, valign="top"  )
+  title("Sepal Length by Species")
+  
+  reg <- lm( Sepal.Length ~ Species, data=iris )
+  textplot( capture.output(summary(reg)), valign="top")
+  title("Regression of Sepal Length by Species")
+  
+  par(mfrow=c(1,1))
+}
+
 ##############
 #####batch processing
 nx1<-33:96
@@ -224,10 +314,12 @@ z=1:18
 #z[-c(4,5,6,7,8,12,13,15,16)]
 #z[-c(4)]
 ### for the time being we omit drosphilia, its a small dataset n=18
-for (i in z[-c(4,5,6,7,8,12,13,15,16)])
+
+varimp<-array(NA,dim=c(1,10))
+
+for (i in 1)
 {
-
-
+i=1
 #temp1<-process.csv(myfiles[[1]])
 temp1<-process.csv(myfiles[[i]])
 
@@ -237,6 +329,8 @@ nxx2<-66:79
 nxx3<-81:dim(temp1)[2] #80 is Sholl.1 should always be 1
 
 cols=rainbow(length(unique(temp1[,1]))+2)
+
+###comment out if running single species
 cols=parsecolors(cols)
 
 
@@ -251,11 +345,13 @@ g1pls<-nipal(as.matrix(temp1[,c(nxx1)]),as.numeric(temp1$y),40)
 v1pls<-vip(g1pls,as.numeric(temp1$y),names(temp1[,c(nxx1)]))
 ftime[2]<-proc.time()[3]-ptm;names(ftime)[2]<-("L-measure pls")
 
-print.err(g1rf,"L-measure",names(myfiles[i]))
-save.err(g1rf,"L-measure",names(myfiles[i]))
+#print.err(g1rf,"L-measure",names(myfiles[i]))
+counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
+save.err(g1rf,"L-measure",names(myfiles[i]),counts)
 v1rf<-varImpPlot(g1rf)
 PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)])
-save.PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)])
+
+varimp<-save.PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)])
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -269,10 +365,11 @@ v2pls<-vip(g2pls,as.numeric(temp1$y),names(temp1[,c(nxx2)]))
 ftime[4]<-proc.time()[3]-ptm;names(ftime)[4]<-("gstat pls")
 
 #print.err(g2,"Gstat","NeuronDataMaster")
-save.err(g2rf,"Gstat",names(myfiles[i]))
+#counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
+save.err(g2rf,"Gstat",names(myfiles[i]),counts)
 v2rf<-varImpPlot(g2rf)
 PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[i]),temp1[,c(nxx2)])
-save.PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[i]),temp1[,c(nxx2)])
+varimp<-save.PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[i]),temp1[,c(nxx2)])
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -284,11 +381,13 @@ set.seed(100)
 g3pls<-nipal(as.matrix(temp1[,c(nxx3)]),as.numeric(temp1$y),40)
 v3pls<-vip(g3pls,as.numeric(temp1$y),names(temp1[,c(nxx3)]))
 ftime[6]<-proc.time()[3]-ptm;names(ftime)[6]<-("sholl pls")
+
 #print.err(g3,"Sholl","NeuronDataMaster")
-save.err(g3rf,"Sholl",names(myfiles[i]))
+#counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
+save.err(g3rf,"Sholl",names(myfiles[i]),counts)
 v3rf<-varImpPlot(g3rf)
 PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[i]),temp1[,c(nxx3)])
-save.PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[i]),temp1[,c(nxx3)])
+varimp<-save.PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[i]),temp1[,c(nxx3)])
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -302,10 +401,11 @@ vtotpls<-vip(gtotpls,as.numeric(temp1$y),names(temp1[,c(nxx1,nxx2,nxx3)]))
 ftime[8]<-proc.time()[3]-ptm;names(ftime)[8]<-("all pls")
 
 #print.err(gtot,"All","NeuronDataMaster")
-save.err(gtotrf,"All",names(myfiles[i]))
+#counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
+save.err(gtotrf,"All",names(myfiles[i]),counts)
 vtotrf<-varImpPlot(gtotrf)
 PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
-save.PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
+varimp<-save.PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
 }
 
 OOB=round(mean(gtotrf$err.rate[last,1])
@@ -467,3 +567,34 @@ df<-data.frame(cols, tf)
 #nrow(dat[dat$y=="rat",])
 #dat2<-dat[dat$y!="rat",]
 #dat2[,1]<-droplevels(dat2[,1])
+
+
+
+####extra code from stack uses gplots
+# # show R version information
+# textplot(version)
+# # show the alphabet as a single string
+# textplot( paste(letters[1:26], collapse=" ") )
+# 
+# # show the alphabet as a matrix 
+# textplot( matrix(letters[1:26], ncol=2))
+# 
+# ### Make a nice 4 way display with two plots and two text summaries 
+# data(iris)  
+# par(mfrow=c(2,2))   
+# plot( Sepal.Length ~ Species, data=iris, border="blue", col="cyan",   
+#       main="Boxplot of Sepal Length by Species" )    
+# plotmeans(Sepal.Length ~ Species, data=iris, barwidth=2, connect=FALSE,
+#           main="Means and 95\% Confidence Intervals\nof Sepal Length by Species")
+# 
+# info <- sapply(split(iris$Sepal.Length, iris$Species),
+#                function(x) round(c(Mean=mean(x), SD=sd(x), N=gdata::nobs(x)),2))
+# 
+# textplot( info, valign="top"  )
+# title("Sepal Length by Species")
+# 
+# reg <- lm( Sepal.Length ~ Species, data=iris )
+# textplot( capture.output(summary(reg)), valign="top")
+# title("Regression of Sepal Length by Species")
+# 
+# par(mfrow=c(1,1))
