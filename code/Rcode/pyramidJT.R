@@ -227,7 +227,7 @@ save.IMP<-function(fname)
 {
   loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
   mkdirs(loc)
-  pdf(file=paste(loc, substr(fname,1,nchar(fname)-4), "VARIMP.pdf"), width=11, 
+  pdf(file=paste(loc, substr(fname,1,nchar(fname)-4), "VARIMP.pdf",sep=""), width=11, 
       height=8.5, pointsize=12,bg="transparent")
   
   
@@ -296,6 +296,17 @@ save.IMP<-function(fname)
 #   par(mfrow=c(1,1))
 }
 
+save.time<-function(fname)
+{
+  loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
+  mkdirs(loc)
+  pdf(file=paste(loc, substr(fname,1,nchar(fname)-4), "time.pdf",sep=""), width=11, 
+      height=8.5, pointsize=12,bg="transparent")
+  textplot(xtable(ftemp[-1,]))
+  dev.off()
+  
+}
+
 ##############
 #####batch processing
 nx1<-33:96
@@ -320,7 +331,9 @@ varimp<-array(NA,dim=c(1,10))
 for (i in z[-c(4)])
 {
   varimp<-array(NA,dim=c(1,10))
-
+  ftemp<-array(NA,dim=c(1,2))
+  dimnames(ftemp)[[2]]<-c("time","OOB")
+#i=1
 #temp1<-process.csv(myfiles[[1]])
 temp1<-process.csv(myfiles[[i]])
 
@@ -338,13 +351,31 @@ cols=parsecolors(cols)
 ptm<-proc.time()[3]
 set.seed(100)
 g1rf<-randomForest(y~.,data=temp1[,c(1,nxx1)])##,prox=TRUE)
-ftime<-proc.time()[3]-ptm;names(ftime)<-("L-measure forest")
+ftime<-round(proc.time()[3]-ptm,4);names(ftime)<-("L-measure forest")
+
+
+last<-end(g1rf$err.rate)[1]
+OOB<-round(mean(g1rf$err.rate[last,1]),3)
+ftemp<-rbind(ftemp,c(ftime[[1]],OOB))
+row.names(ftemp)[nrow(ftemp)]<-names(ftime)
+
+
+
+
 
 ptm<-proc.time()[3]
 set.seed(100)
 g1pls<-nipal(as.matrix(temp1[,c(nxx1)]),as.numeric(temp1$y),40)
 v1pls<-vip(g1pls,as.numeric(temp1$y),names(temp1[,c(nxx1)]))
-ftime[2]<-proc.time()[3]-ptm;names(ftime)[2]<-("L-measure pls")
+ftime[2]<-round(proc.time()[3]-ptm,4);names(ftime)[2]<-("L-measure pls")
+
+
+ftemp<-rbind(ftemp,c(ftime[[2]],NA))
+row.names(ftemp)[nrow(ftemp)]<-names(ftime)[2]
+
+
+
+
 
 #print.err(g1rf,"L-measure",names(myfiles[i]))
 counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
@@ -357,13 +388,27 @@ varimp<-save.PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)])
 ptm<-proc.time()[3]
 set.seed(100)
 g2rf<-randomForest(y~.,data=temp1[,c(1,nxx2)])##,prox=TRUE)
-ftime[3]<-proc.time()[3]-ptm;names(ftime)[3]<-("gstat forest")
+ftime[3]<-round(proc.time()[3]-ptm,4);names(ftime)[3]<-("gstat forest")
+
+
+last<-end(g2rf$err.rate)[1]
+OOB<-round(mean(g2rf$err.rate[last,1]),3)
+ftemp<-rbind(ftemp,c(ftime[[3]],OOB))
+row.names(ftemp)[nrow(ftemp)]<-names(ftime)[3]
+
+
 
 ptm<-proc.time()[3]
 set.seed(100)
 g2pls<-nipal(as.matrix(temp1[,c(nxx2)]),as.numeric(temp1$y),40)
 v2pls<-vip(g2pls,as.numeric(temp1$y),names(temp1[,c(nxx2)]))
-ftime[4]<-proc.time()[3]-ptm;names(ftime)[4]<-("gstat pls")
+ftime[4]<-round(proc.time()[3]-ptm,4);names(ftime)[4]<-("gstat pls")
+
+
+ftemp<-rbind(ftemp,c(ftime[[4]],NA))
+row.names(ftemp)[nrow(ftemp)]<-names(ftime)[4]
+
+
 
 #print.err(g2,"Gstat","NeuronDataMaster")
 #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
@@ -375,13 +420,27 @@ varimp<-save.PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[i]),temp1[,c(nxx2)])
 ptm<-proc.time()[3]
 set.seed(100)
 g3rf<-randomForest(y~.,data=temp1[,c(1,nxx3)])##,prox=TRUE)
-ftime[5]<-proc.time()[3]-ptm;names(ftime)[5]<-("sholl forest")
+ftime[5]<-round(proc.time()[3]-ptm,4);names(ftime)[5]<-("sholl forest")
+
+
+last<-end(g3rf$err.rate)[1]
+OOB<-round(mean(g3rf$err.rate[last,1]),3)
+ftemp<-rbind(ftemp,c(ftime[[5]],OOB))
+row.names(ftemp)[nrow(ftemp)]<-names(ftime)[5]
+
+
 
 ptm<-proc.time()[3]
 set.seed(100)
 g3pls<-nipal(as.matrix(temp1[,c(nxx3)]),as.numeric(temp1$y),40)
 v3pls<-vip(g3pls,as.numeric(temp1$y),names(temp1[,c(nxx3)]))
-ftime[6]<-proc.time()[3]-ptm;names(ftime)[6]<-("sholl pls")
+ftime[6]<-round(proc.time()[3]-ptm,4);names(ftime)[6]<-("sholl pls")
+
+
+ftemp<-rbind(ftemp,c(ftime[[6]],NA))
+row.names(ftemp)[nrow(ftemp)]<-names(ftime)[6]
+
+
 
 #print.err(g3,"Sholl","NeuronDataMaster")
 #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
@@ -393,13 +452,27 @@ varimp<-save.PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[i]),temp1[,c(nxx3)])
 ptm<-proc.time()[3]
 set.seed(100)
 gtotrf<-randomForest(y~.,data=temp1[,c(1,nxx1,nxx2,nxx3)])##,prox=TRUE)
-ftime[7]<-proc.time()[3]-ptm;names(ftime)[7]<-("All forest")
+ftime[7]<-round(proc.time()[3]-ptm,4);names(ftime)[7]<-("All forest")
+
+
+last<-end(gtotrf$err.rate)[1]
+OOB<-round(mean(gtotrf$err.rate[last,1]),3)
+ftemp<-rbind(ftemp,c(ftime[[7]],OOB))
+row.names(ftemp)[nrow(ftemp)]<-names(ftime)[7]
+
+
 
 ptm<-proc.time()[3]
 set.seed(100)
 gtotpls<-nipal(as.matrix(temp1[,c(nxx1,nxx2,nxx3)]),as.numeric(temp1$y),40)
 vtotpls<-vip(gtotpls,as.numeric(temp1$y),names(temp1[,c(nxx1,nxx2,nxx3)]))
-ftime[8]<-proc.time()[3]-ptm;names(ftime)[8]<-("all pls")
+ftime[8]<-round(proc.time()[3]-ptm,4);names(ftime)[8]<-("all pls")
+
+
+ftemp<-rbind(ftemp,c(ftime[[8]],NA))
+row.names(ftemp)[nrow(ftemp)]<-names(ftime)[8]
+
+
 
 #print.err(gtot,"All","NeuronDataMaster")
 #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
@@ -409,6 +482,7 @@ PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
 varimp<-save.PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
 
 save.IMP(names(myfiles[i]))
+save.time(names(myfiles[i]))
 
 }
 
