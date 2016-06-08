@@ -13,8 +13,9 @@ temp =list.files(pattern="../*.csv")
 myfiles<-lapply(temp, function(x) read.csv(x,header=TRUE))
 names(myfiles)<-temp
 
-#########
+
 #### fxns 
+#########
 mkdirs <- function(fp) {
   if(!file.exists(fp)) {
     mkdirs(dirname(fp))
@@ -99,7 +100,7 @@ print.err<-function(rfor,subj,fname)
 save.err<-function(rfor,subj,fname,counts)
 {
   last<-end(rfor$err.rate)[1]
-  mains<-paste(subj, ", OOB=",round(mean(rfor$err.rate[last,1]),3))
+  mains<-paste(subj, ", OOB = ",round(mean(rfor$err.rate[last,1]),3),sep="")
   loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
   mkdirs(loc)
   
@@ -108,8 +109,14 @@ save.err<-function(rfor,subj,fname,counts)
  
   pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "1.pdf"), width=11, 
       height=8.5, pointsize=12)
-  matplot(rfor$err.rate,lwd=2,col=cols,lty=c(1,2,4,6),type="l",main=mains,
-          sub=fname, cex.sub=.7)
+  matplot(rfor$err.rate,lwd=2,col=cols,lty=c(1,2,4,6),type="l",
+          main=mains, cex.main=1.2,font.main=1,
+          sub=fname, cex.sub=.7,ylab="Error rate (%)",xlab="# of trees")
+  
+#   plot(vpls,vrf,main=paste(subj,", PLS vs. RF variable importance"),font.main=1,
+#        cex.main=1.2,sub=fname,cex.sub=.8,
+#        ylab="RF (Variable Score)",xlab="PLS (Variable Score)",
+#        pch=16,bg="transparent")
   #label err rates at 100
   hund<-rep(100,dim(rfor$err.rate)[2])
   textxy(hund,rfor$err.rate[100,],round(rfor$err.rate[100,],2), cex=1.2)
@@ -123,7 +130,8 @@ save.err<-function(rfor,subj,fname,counts)
   #       height=768, pointsize=12, res=144)
   pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "2.pdf"), width=11, 
       height=8.5, pointsize=12)
-  varImpPlot(rfor, main=subj,sub=fname,cex.sub=.7,bg="transparent")
+  varImpPlot(rfor, main=paste(subj,", RF variable importance",sep=""),
+             cex.main=1.2,font.main=1,sub=fname,cex.sub=.7,bg="transparent")
   dev.off()
 }
 
@@ -158,9 +166,10 @@ save.PLSvRF<-function(vrf,vpls,subj,fname,dat)
   
   vrf<-scale(vrf)
   vpls<-scale(vpls)
-  plot(vpls,vrf,main=subj,sub=fname,cex.sub=.7,
+  plot(vpls,vrf,main=paste(subj,", PLS vs. RF variable importance",sep=""),font.main=1,
+       cex.main=1.2,sub=fname,cex.sub=.8,
        ylab="RF (Variable Score)",xlab="PLS (Variable Score)",
-       pch=16,cex.sub=0.8,bg="transparent")
+       pch=16,bg="transparent")
   #x<-as.matrix(dat[,c(nxx1)])
   x<-as.matrix(dat[,])
   
@@ -307,8 +316,9 @@ save.time<-function(fname)
   
 }
 
+
+#### batch processing
 ##############
-#####batch processing
 nx1<-33:96
 nx2<-97:110
 nx3<-111:159
@@ -332,7 +342,7 @@ for (i in z[-c(4)])
 {
   varimp<-array(NA,dim=c(1,10))
   ftemp<-array(NA,dim=c(1,2))
-  dimnames(ftemp)[[2]]<-c("time","OOB")
+  dimnames(ftemp)[[2]]<-c("time (s)","OOB")
 #i=1
 #temp1<-process.csv(myfiles[[1]])
 temp1<-process.csv(myfiles[[i]])
@@ -412,15 +422,15 @@ row.names(ftemp)[nrow(ftemp)]<-names(ftime)[4]
 
 #print.err(g2,"Gstat","NeuronDataMaster")
 #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
-save.err(g2rf,"Gstat",names(myfiles[i]),counts)
+save.err(g2rf,"Tree topology",names(myfiles[i]),counts)
 v2rf<-varImpPlot(g2rf)
-PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[i]),temp1[,c(nxx2)])
-varimp<-save.PLSvRF(v2rf,v2pls,"Gstat",names(myfiles[i]),temp1[,c(nxx2)])
+PLSvRF(v2rf,v2pls,"Tree topology",names(myfiles[i]),temp1[,c(nxx2)])
+varimp<-save.PLSvRF(v2rf,v2pls,"Tree topology",names(myfiles[i]),temp1[,c(nxx2)])
 
 ptm<-proc.time()[3]
 set.seed(100)
 g3rf<-randomForest(y~.,data=temp1[,c(1,nxx3)])##,prox=TRUE)
-ftime[5]<-round(proc.time()[3]-ptm,4);names(ftime)[5]<-("sholl forest")
+ftime[5]<-round(proc.time()[3]-ptm,4);names(ftime)[5]<-("Sholl random forest")
 
 
 last<-end(g3rf$err.rate)[1]
@@ -434,7 +444,7 @@ ptm<-proc.time()[3]
 set.seed(100)
 g3pls<-nipal(as.matrix(temp1[,c(nxx3)]),as.numeric(temp1$y),40)
 v3pls<-vip(g3pls,as.numeric(temp1$y),names(temp1[,c(nxx3)]))
-ftime[6]<-round(proc.time()[3]-ptm,4);names(ftime)[6]<-("sholl pls")
+ftime[6]<-round(proc.time()[3]-ptm,4);names(ftime)[6]<-("Sholl analysis PLS")
 
 
 ftemp<-rbind(ftemp,c(ftime[[6]],NA))
@@ -442,17 +452,17 @@ row.names(ftemp)[nrow(ftemp)]<-names(ftime)[6]
 
 
 
-#print.err(g3,"Sholl","NeuronDataMaster")
+#print.err(g3,"Sholl analysis","NeuronDataMaster")
 #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
-save.err(g3rf,"Sholl",names(myfiles[i]),counts)
+save.err(g3rf,"Sholl analysis",names(myfiles[i]),counts)
 v3rf<-varImpPlot(g3rf)
-PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[i]),temp1[,c(nxx3)])
-varimp<-save.PLSvRF(v3rf,v3pls,"Sholl",names(myfiles[i]),temp1[,c(nxx3)])
+PLSvRF(v3rf,v3pls,"Sholl analysis",names(myfiles[i]),temp1[,c(nxx3)])
+varimp<-save.PLSvRF(v3rf,v3pls,"Sholl analysis",names(myfiles[i]),temp1[,c(nxx3)])
 
 ptm<-proc.time()[3]
 set.seed(100)
 gtotrf<-randomForest(y~.,data=temp1[,c(1,nxx1,nxx2,nxx3)])##,prox=TRUE)
-ftime[7]<-round(proc.time()[3]-ptm,4);names(ftime)[7]<-("All forest")
+ftime[7]<-round(proc.time()[3]-ptm,4);names(ftime)[7]<-("Combined random forest")
 
 
 last<-end(gtotrf$err.rate)[1]
@@ -466,7 +476,7 @@ ptm<-proc.time()[3]
 set.seed(100)
 gtotpls<-nipal(as.matrix(temp1[,c(nxx1,nxx2,nxx3)]),as.numeric(temp1$y),40)
 vtotpls<-vip(gtotpls,as.numeric(temp1$y),names(temp1[,c(nxx1,nxx2,nxx3)]))
-ftime[8]<-round(proc.time()[3]-ptm,4);names(ftime)[8]<-("all pls")
+ftime[8]<-round(proc.time()[3]-ptm,4);names(ftime)[8]<-("Combined PLS")
 
 
 ftemp<-rbind(ftemp,c(ftime[[8]],NA))
@@ -474,12 +484,12 @@ row.names(ftemp)[nrow(ftemp)]<-names(ftime)[8]
 
 
 
-#print.err(gtot,"All","NeuronDataMaster")
+#print.err(gtot,"Combined","NeuronDataMaster")
 #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
-save.err(gtotrf,"All",names(myfiles[i]),counts)
+save.err(gtotrf,"Combined",names(myfiles[i]),counts)
 vtotrf<-varImpPlot(gtotrf)
-PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
-varimp<-save.PLSvRF(vtotrf,vtotpls,"All",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
+PLSvRF(vtotrf,vtotpls,"Combined",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
+varimp<-save.PLSvRF(vtotrf,vtotpls,"Combined",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
 
 save.IMP(names(myfiles[i]))
 save.time(names(myfiles[i]))
