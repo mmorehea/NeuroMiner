@@ -3,6 +3,8 @@ library(calibrate)
 library(gplots)
 library(plyr)
 library(xtable)
+library(VGAM)
+library(nnet)
 setwd("~/NeuroMiner/data_sets")
 #read.csv("../first_subsets/pyramidal_appended.csv",T)->dump
 read.csv("NeuronDataMaster.csv",T)->colmaster
@@ -44,6 +46,21 @@ process.csv<-function(x)
   dat$Fractal_Dim<-as.numeric(dat$Fractal_Dim)
   return(dat)  
 }  
+
+try.multinom<-function(pdata,ltemp,numvar)
+{
+  vars<-tail(order(scale(pdata)),numvar)
+  index<-append(vars+1,1,0)
+  scaletemp<-data.frame(apply(ltemp[,c(index[-1])], MARGIN = 2, FUN = function(X) (X - min(X))/diff(range(X))))
+  scaletemp<-cbind(y=ltemp$y,scaletemp)
+  lmeasure<-tryCatch({multinom(y~.,data=scaletemp,maxit=100)},
+                     error=function(err){
+                       lmeasure<-data.frame(deviance<-0)
+                       return<-lmeasure})
+  
+  return(round(lmeasure$deviance,3))
+  
+}
 
 parsecolors<-function(cols)
 {
@@ -316,8 +333,8 @@ save.time<-function(fname)
   
 }
 
-
-#### batch processing
+#####
+## batch processing
 ##############
 nx1<-33:96
 nx2<-97:110
@@ -341,8 +358,8 @@ varimp<-array(NA,dim=c(1,10))
 for (i in z[-c(4)])
 {
   varimp<-array(NA,dim=c(1,10))
-  ftemp<-array(NA,dim=c(1,2))
-  dimnames(ftemp)[[2]]<-c("time (s)","OOB")
+  ftemp<-array(NA,dim=c(1,3))
+  dimnames(ftemp)[[2]]<-c("time (s)","OOB","R deviance")
 #i=1
 #temp1<-process.csv(myfiles[[1]])
 temp1<-process.csv(myfiles[[i]])
@@ -363,13 +380,13 @@ set.seed(100)
 g1rf<-randomForest(y~.,data=temp1[,c(1,nxx1)])##,prox=TRUE)
 ftime<-round(proc.time()[3]-ptm,4);names(ftime)<-("L-measure forest")
 
-
+v1rf<-varImpPlot(g1rf)
+dev<-try.multinom(v1rf,temp1,5)
 last<-end(g1rf$err.rate)[1]
 OOB<-round(mean(g1rf$err.rate[last,1]),3)
-ftemp<-rbind(ftemp,c(ftime[[1]],OOB))
+
+ftemp<-rbind(ftemp,c(ftime[[1]],OOB,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)
-
-
 
 
 
@@ -379,34 +396,64 @@ g1pls<-nipal(as.matrix(temp1[,c(nxx1)]),as.numeric(temp1$y),40)
 v1pls<-vip(g1pls,as.numeric(temp1$y),names(temp1[,c(nxx1)]))
 ftime[2]<-round(proc.time()[3]-ptm,4);names(ftime)[2]<-("L-measure pls")
 
-
-ftemp<-rbind(ftemp,c(ftime[[2]],NA))
+dev<-try.multinom(v1pls,temp1,5)
+ftemp<-rbind(ftemp,c(ftime[[2]],NA,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[2]
-
-
-
-
 
 #print.err(g1rf,"L-measure",names(myfiles[i]))
 counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
 save.err(g1rf,"L-measure",names(myfiles[i]),counts)
-v1rf<-varImpPlot(g1rf)
 PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)])
 
 varimp<-save.PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)])
+
+
+#old multinom code
+#####
+
+# vars<-tail(order(scale(v1rf)),5)
+# index<-append(vars+1,1,0)
+# scaletemp<-data.frame(apply(temp1[,c(index[-1])], MARGIN = 2, FUN = function(X) (X - min(X))/diff(range(X))))
+# scaletemp<-cbind(y=temp1$y,scaletemp)
+# lmeasure<-multinom(y~.,data=scaletemp,maxit=200)
+# 
+# lmeasure1<-vglm(y~.,data=scaletemp,family=multinomial)
+# 
+# vars<-tail(order(scale(v1pls)),5)
+# index<-append(vars+1,1,0)
+# scaletemp<-data.frame(apply(temp1[,c(index[-1])], MARGIN = 2, FUN = function(X) (X - min(X))/diff(range(X))))
+# scaletemp<-cbind(y=temp1$y,scaletemp)
+# lmeasure<-multinom(y~.,data=scaletemp)
+# 
+# lmeasure1<-vglm(y~.,data=scaletemp,family=multinomial)
+# lmeasure0<-vglm(y~1,data=scaletemp,family=multinomial)
+
+
+# lmeasure<-multinom(y~varimp[2]+varimp[3],data=temp1[,c(1,nxx1)])
+# lmeasure<-multinom(y~.,data=temp1[,c(index)])
+# junklist<-dimnames(scale(v1rf))[[1]]
+# vars<-tail(order(scale(v1rf)),5)
+# index<-append(vars+1,1,0)
+# junklist[c(vars)]
+# y<-temp1[,c(1,nxx1)]$y
+
+#somestuff<-aov(temp1[,c(1,nxx1)]$y~temp1[,c(1,nxx1)][c(vars+1)])
+
+#####
+
+
 
 ptm<-proc.time()[3]
 set.seed(100)
 g2rf<-randomForest(y~.,data=temp1[,c(1,nxx2)])##,prox=TRUE)
 ftime[3]<-round(proc.time()[3]-ptm,4);names(ftime)[3]<-("gstat forest")
 
-
+v2rf<-varImpPlot(g2rf)
+dev<-try.multinom(v2rf,temp1,5)
 last<-end(g2rf$err.rate)[1]
 OOB<-round(mean(g2rf$err.rate[last,1]),3)
-ftemp<-rbind(ftemp,c(ftime[[3]],OOB))
+ftemp<-rbind(ftemp,c(ftime[[3]],OOB,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[3]
-
-
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -414,16 +461,13 @@ g2pls<-nipal(as.matrix(temp1[,c(nxx2)]),as.numeric(temp1$y),40)
 v2pls<-vip(g2pls,as.numeric(temp1$y),names(temp1[,c(nxx2)]))
 ftime[4]<-round(proc.time()[3]-ptm,4);names(ftime)[4]<-("gstat pls")
 
-
-ftemp<-rbind(ftemp,c(ftime[[4]],NA))
+dev<-try.multinom(v2pls,temp1,5)
+ftemp<-rbind(ftemp,c(ftime[[4]],NA,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[4]
-
-
 
 #print.err(g2,"Gstat","NeuronDataMaster")
 #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
 save.err(g2rf,"Tree topology",names(myfiles[i]),counts)
-v2rf<-varImpPlot(g2rf)
 PLSvRF(v2rf,v2pls,"Tree topology",names(myfiles[i]),temp1[,c(nxx2)])
 varimp<-save.PLSvRF(v2rf,v2pls,"Tree topology",names(myfiles[i]),temp1[,c(nxx2)])
 
@@ -432,13 +476,12 @@ set.seed(100)
 g3rf<-randomForest(y~.,data=temp1[,c(1,nxx3)])##,prox=TRUE)
 ftime[5]<-round(proc.time()[3]-ptm,4);names(ftime)[5]<-("Sholl random forest")
 
-
+v3rf<-varImpPlot(g3rf)
+dev<-try.multinom(v3rf,temp1,5)
 last<-end(g3rf$err.rate)[1]
 OOB<-round(mean(g3rf$err.rate[last,1]),3)
-ftemp<-rbind(ftemp,c(ftime[[5]],OOB))
+ftemp<-rbind(ftemp,c(ftime[[5]],OOB,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[5]
-
-
 
 ptm<-proc.time()[3]
 set.seed(100)
@@ -446,28 +489,27 @@ g3pls<-nipal(as.matrix(temp1[,c(nxx3)]),as.numeric(temp1$y),40)
 v3pls<-vip(g3pls,as.numeric(temp1$y),names(temp1[,c(nxx3)]))
 ftime[6]<-round(proc.time()[3]-ptm,4);names(ftime)[6]<-("Sholl analysis PLS")
 
-
-ftemp<-rbind(ftemp,c(ftime[[6]],NA))
+dev<-try.multinom(v3pls,temp1,5)
+ftemp<-rbind(ftemp,c(ftime[[6]],NA,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[6]
-
-
 
 #print.err(g3,"Sholl analysis","NeuronDataMaster")
 #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
 save.err(g3rf,"Sholl analysis",names(myfiles[i]),counts)
-v3rf<-varImpPlot(g3rf)
 PLSvRF(v3rf,v3pls,"Sholl analysis",names(myfiles[i]),temp1[,c(nxx3)])
 varimp<-save.PLSvRF(v3rf,v3pls,"Sholl analysis",names(myfiles[i]),temp1[,c(nxx3)])
+
 
 ptm<-proc.time()[3]
 set.seed(100)
 gtotrf<-randomForest(y~.,data=temp1[,c(1,nxx1,nxx2,nxx3)])##,prox=TRUE)
 ftime[7]<-round(proc.time()[3]-ptm,4);names(ftime)[7]<-("Combined random forest")
+vtotrf<-varImpPlot(gtotrf)
 
-
+dev<-try.multinom(vtotrf,temp1,5)
 last<-end(gtotrf$err.rate)[1]
 OOB<-round(mean(gtotrf$err.rate[last,1]),3)
-ftemp<-rbind(ftemp,c(ftime[[7]],OOB))
+ftemp<-rbind(ftemp,c(ftime[[7]],OOB,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[7]
 
 
@@ -478,16 +520,13 @@ gtotpls<-nipal(as.matrix(temp1[,c(nxx1,nxx2,nxx3)]),as.numeric(temp1$y),40)
 vtotpls<-vip(gtotpls,as.numeric(temp1$y),names(temp1[,c(nxx1,nxx2,nxx3)]))
 ftime[8]<-round(proc.time()[3]-ptm,4);names(ftime)[8]<-("Combined PLS")
 
-
-ftemp<-rbind(ftemp,c(ftime[[8]],NA))
+dev<-try.multinom(vtotpls,temp1,5)
+ftemp<-rbind(ftemp,c(ftime[[8]],NA,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[8]
-
-
 
 #print.err(gtot,"Combined","NeuronDataMaster")
 #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
 save.err(gtotrf,"Combined",names(myfiles[i]),counts)
-vtotrf<-varImpPlot(gtotrf)
 PLSvRF(vtotrf,vtotpls,"Combined",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
 varimp<-save.PLSvRF(vtotrf,vtotpls,"Combined",names(myfiles[i]),temp1[,c(nxx1,nxx2,nxx3)])
 
