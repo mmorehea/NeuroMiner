@@ -1,0 +1,19 @@
+Four Species
+  L-measure	- mouse is bad~ due to age?
+  Tree topo	- c elegans and mouse are bad
+  Sholl		- mouse and human are bad
+  All		- mouse is bad
+
+Four Species no axon
+  L-measure	- mouse and elegans (n=5)
+  Tree topo	- mouse and elegans (n=5)
+  Sholl		- mouse human and elegans (n=5)
+  All		- mouse and elegans (n=5)
+
+Four Species with axon
+  L-measure	- mouse and human (n=8)
+  Tree topo	- mouse and human (n=8)
+  Sholl		- mouse and human (n=8)
+  All		- mouse and human (n=8)
+
+
