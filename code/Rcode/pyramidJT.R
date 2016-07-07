@@ -216,7 +216,9 @@ nipal<-function(x,y,k)
     wt<-t(x)%*%y/as.numeric(t(y)%*%x%*%t(x)%*%y)
     tt<-x%*%wt
     pt<- t(x)%*%tt/as.numeric(t(tt)%*%tt)
-    
+    ## add tuning parameter gamma if above is zero
+    # would have to be cross validated
+    # example to test
     npt<-as.numeric(sqrt(t(pt)%*%pt))
     wn<-npt*wt
     tn<-npt*tt
@@ -349,13 +351,14 @@ ny<-4
 
 
 z=1:18
+
 #z[-c(4,5,6,7,8,12,13,15,16)]
 #z[-c(4)]
 ### for the time being we omit drosphilia, its a small dataset n=18
 
 varimp<-array(NA,dim=c(1,10))
 
-for (i in z[-c(4)])
+for (i in z[c(9,10,11)])
 {
   varimp<-array(NA,dim=c(1,10))
   ftemp<-array(NA,dim=c(1,3))
@@ -381,7 +384,8 @@ g1rf<-randomForest(y~.,data=temp1[,c(1,nxx1)])##,prox=TRUE)
 ftime<-round(proc.time()[3]-ptm,4);names(ftime)<-("L-measure forest")
 
 v1rf<-varImpPlot(g1rf)
-dev<-try.multinom(v1rf,temp1,5)
+#dev<-try.multinom(v1rf,temp1,5)
+dev<-0
 last<-end(g1rf$err.rate)[1]
 OOB<-round(mean(g1rf$err.rate[last,1]),3)
 
@@ -396,7 +400,7 @@ g1pls<-nipal(as.matrix(temp1[,c(nxx1)]),as.numeric(temp1$y),40)
 v1pls<-vip(g1pls,as.numeric(temp1$y),names(temp1[,c(nxx1)]))
 ftime[2]<-round(proc.time()[3]-ptm,4);names(ftime)[2]<-("L-measure pls")
 
-dev<-try.multinom(v1pls,temp1,5)
+#dev<-try.multinom(v1pls,temp1,5)
 ftemp<-rbind(ftemp,c(ftime[[2]],NA,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[2]
 
@@ -413,9 +417,19 @@ varimp<-save.PLSvRF(v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)])
 
 # vars<-tail(order(scale(v1rf)),5)
 # index<-append(vars+1,1,0)
+# index<-vars+1
+# 
 # scaletemp<-data.frame(apply(temp1[,c(index[-1])], MARGIN = 2, FUN = function(X) (X - min(X))/diff(range(X))))
+# 
+# scaletemp<-data.frame(apply(temp1[,c(index)], MARGIN = 2, FUN = function(X) (X - min(X))/diff(range(X))))
+# 
 # scaletemp<-cbind(y=temp1$y,scaletemp)
 # lmeasure<-multinom(y~.,data=scaletemp,maxit=200)
+# 
+# lmeasure1<-mlogit(y~.,data=scaletemp,shape="wide")
+# 
+# 
+# 
 # 
 # lmeasure1<-vglm(y~.,data=scaletemp,family=multinomial)
 # 
@@ -449,7 +463,8 @@ g2rf<-randomForest(y~.,data=temp1[,c(1,nxx2)])##,prox=TRUE)
 ftime[3]<-round(proc.time()[3]-ptm,4);names(ftime)[3]<-("gstat forest")
 
 v2rf<-varImpPlot(g2rf)
-dev<-try.multinom(v2rf,temp1,5)
+#dev<-try.multinom(v2rf,temp1,5)
+dev<-0
 last<-end(g2rf$err.rate)[1]
 OOB<-round(mean(g2rf$err.rate[last,1]),3)
 ftemp<-rbind(ftemp,c(ftime[[3]],OOB,dev))
@@ -461,7 +476,7 @@ g2pls<-nipal(as.matrix(temp1[,c(nxx2)]),as.numeric(temp1$y),40)
 v2pls<-vip(g2pls,as.numeric(temp1$y),names(temp1[,c(nxx2)]))
 ftime[4]<-round(proc.time()[3]-ptm,4);names(ftime)[4]<-("gstat pls")
 
-dev<-try.multinom(v2pls,temp1,5)
+#dev<-try.multinom(v2pls,temp1,5)
 ftemp<-rbind(ftemp,c(ftime[[4]],NA,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[4]
 
@@ -477,7 +492,7 @@ g3rf<-randomForest(y~.,data=temp1[,c(1,nxx3)])##,prox=TRUE)
 ftime[5]<-round(proc.time()[3]-ptm,4);names(ftime)[5]<-("Sholl random forest")
 
 v3rf<-varImpPlot(g3rf)
-dev<-try.multinom(v3rf,temp1,5)
+#dev<-try.multinom(v3rf,temp1,5)
 last<-end(g3rf$err.rate)[1]
 OOB<-round(mean(g3rf$err.rate[last,1]),3)
 ftemp<-rbind(ftemp,c(ftime[[5]],OOB,dev))
@@ -489,7 +504,7 @@ g3pls<-nipal(as.matrix(temp1[,c(nxx3)]),as.numeric(temp1$y),40)
 v3pls<-vip(g3pls,as.numeric(temp1$y),names(temp1[,c(nxx3)]))
 ftime[6]<-round(proc.time()[3]-ptm,4);names(ftime)[6]<-("Sholl analysis PLS")
 
-dev<-try.multinom(v3pls,temp1,5)
+#dev<-try.multinom(v3pls,temp1,5)
 ftemp<-rbind(ftemp,c(ftime[[6]],NA,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[6]
 
@@ -506,7 +521,7 @@ gtotrf<-randomForest(y~.,data=temp1[,c(1,nxx1,nxx2,nxx3)])##,prox=TRUE)
 ftime[7]<-round(proc.time()[3]-ptm,4);names(ftime)[7]<-("Combined random forest")
 vtotrf<-varImpPlot(gtotrf)
 
-dev<-try.multinom(vtotrf,temp1,5)
+#dev<-try.multinom(vtotrf,temp1,5)
 last<-end(gtotrf$err.rate)[1]
 OOB<-round(mean(gtotrf$err.rate[last,1]),3)
 ftemp<-rbind(ftemp,c(ftime[[7]],OOB,dev))
@@ -520,7 +535,7 @@ gtotpls<-nipal(as.matrix(temp1[,c(nxx1,nxx2,nxx3)]),as.numeric(temp1$y),40)
 vtotpls<-vip(gtotpls,as.numeric(temp1$y),names(temp1[,c(nxx1,nxx2,nxx3)]))
 ftime[8]<-round(proc.time()[3]-ptm,4);names(ftime)[8]<-("Combined PLS")
 
-dev<-try.multinom(vtotpls,temp1,5)
+#dev<-try.multinom(vtotpls,temp1,5)
 ftemp<-rbind(ftemp,c(ftime[[8]],NA,dev))
 row.names(ftemp)[nrow(ftemp)]<-names(ftime)[8]
 
