@@ -94,18 +94,22 @@ def main():
 	# parameterList.append(('./data_sets/Neuron_subsets/rat_1to18days.csv', './data_sets/Neuron_subsets/excludeArchiveList_pyramidal_rat_1to18days.csv', 'if data_set.ix[rowNum, \'Archive Name\'] in [\'Brown\', \'Buzsaki\', \'DeFelipe\', \'Flores\', \'Gonzalez-Burgos\', \'Hamad\', \'Henckens\', \'Lewis\', \'Long\', \'Svoboda\'] or \'pyramidal\' not in data_set.ix[rowNum, \'Secondary Cell Class\'].lower():'))
 	
 	# 17. Set with only those species that appear more than 100 times in the original dataset.
-	parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/speciesCountOver100_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'] in [\'elephant\', \'pouched lamprey\', \'salamander\', \'minke whale\', \'goldfish\', \'blowfly\', \'bottlenose dolphin\', \'chicken\', \'frog\', \'Siberian tiger\', \'clouded leopard\', \'guinea pig\', \'zebrafish\', \'proechimys\', \'drosophila melanogaster\', \'manatee\', \'moth\', \'spiny lobster\', \'rabbit\']:'))
+	# parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/speciesCountOver100_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'] in [\'elephant\', \'pouched lamprey\', \'salamander\', \'minke whale\', \'goldfish\', \'blowfly\', \'bottlenose dolphin\', \'chicken\', \'frog\', \'Siberian tiger\', \'clouded leopard\', \'guinea pig\', \'zebrafish\', \'proechimys\', \'drosophila melanogaster\', \'manatee\', \'moth\', \'spiny lobster\', \'rabbit\']:'))
 
 	# 18. Set with only those species that appear less than 100 times in the original dataset. 
-	parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/speciesCountUnder100_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'] in [\'rat\', \'mouse\', \'human\', \'chimpanzee\', \'monkey\', \'giraffe\', \'C. elegans\', \'sheep\', \'domestic pig\', \'humpback whale\', \'cat\']:'))
+	# parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/speciesCountUnder100_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'] in [\'rat\', \'mouse\', \'human\', \'chimpanzee\', \'monkey\', \'giraffe\', \'C. elegans\', \'sheep\', \'domestic pig\', \'humpback whale\', \'cat\']:'))
+
+	# 19. Set from Jesse's email, #1.
+	# parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/subset1_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'].lower() not in [\'rat\', \'mouse\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() not in [\'pyramidal\'] and data_set.ix[rowNum, \'Primary Brain Region\'].lower() not in [\'neocortex\', \'cerebellum\', \'amygdala\']:'))
+
+	# 20. Set from Jesse's email, #2. 
+	parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/subset2_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'].lower() not in [\'rat\'] and not (data_set.ix[rowNum, \'Primary Brain Region\'].lower() in [\'hippocampus\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() in [\'pyramidal\']) and not (data_set.ix[rowNum, \'Primary Brain Region\'].lower() in [\'brainstem\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() in [\'motoneuron\']) and not (data_set.ix[rowNum, \'Primary Brain Region\'].lower() in [\'neocortex\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() in [\'pyramidal\', \'basket\']):'))
 
 
-	try:
-		for each in parameterList:
-			makeSubset(each[0], each[1], each[2])
-		print '\nFor options, please go to the main method of this script.\n'
-	except:
-		print 'Could not find one or more of the required precursors for making the subsets. Please check the main method and try again.'
+	
+	for each in parameterList:
+		makeSubset(each[0], each[1], each[2])
+	print '\nFor options, please go to the main method of this script.\n'
 
 
 # check for strings ko and tko - these are the knockouts we prolly don't want them
