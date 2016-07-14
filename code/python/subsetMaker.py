@@ -100,10 +100,10 @@ def main():
 	# parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/speciesCountUnder100_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'] in [\'rat\', \'mouse\', \'human\', \'chimpanzee\', \'monkey\', \'giraffe\', \'C. elegans\', \'sheep\', \'domestic pig\', \'humpback whale\', \'cat\']:'))
 
 	# 19. Set from Jesse's email, #1.
-	# parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/subset1_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'].lower() not in [\'rat\', \'mouse\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() not in [\'pyramidal\'] and data_set.ix[rowNum, \'Primary Brain Region\'].lower() not in [\'neocortex\', \'cerebellum\', \'amygdala\']:'))
+	# parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/subset1_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'].lower() not in [\'rat\', \'mouse\'] or data_set.ix[rowNum, \'Secondary Cell Class\'].lower() not in [\'pyramidal\'] or data_set.ix[rowNum, \'Primary Brain Region\'].lower() not in [\'neocortex\', \'cerebellum\', \'amygdala\']:'))
 
 	# 20. Set from Jesse's email, #2. 
-	parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/subset2_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'].lower() not in [\'rat\'] and not (data_set.ix[rowNum, \'Primary Brain Region\'].lower() in [\'hippocampus\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() in [\'pyramidal\']) and not (data_set.ix[rowNum, \'Primary Brain Region\'].lower() in [\'brainstem\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() in [\'motoneuron\']) and not (data_set.ix[rowNum, \'Primary Brain Region\'].lower() in [\'neocortex\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() in [\'pyramidal\', \'basket\']):'))
+	parameterList.append(('./data_sets/NeuronDataMaster.csv', './data_sets/Neuron_subsets/subset2_NeuronDataMaster.csv', 'if data_set.ix[rowNum, \'Species Name\'].lower() not in [\'rat\'] or not ((data_set.ix[rowNum, \'Primary Brain Region\'].lower() in [\'hippocampus\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() in [\'pyramidal\']) or (data_set.ix[rowNum, \'Primary Brain Region\'].lower() in [\'brainstem\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() in [\'motoneuron\']) or (data_set.ix[rowNum, \'Primary Brain Region\'].lower() in [\'neocortex\'] and data_set.ix[rowNum, \'Secondary Cell Class\'].lower() in [\'pyramidal\', \'basket\'])):'))
 
 
 	
