@@ -5,9 +5,224 @@ library(plyr)
 library(xtable)
 library(VGAM)
 library(nnet)
+library(e1071)
 setwd("~/NeuroMiner/data_sets")
 #read.csv("../first_subsets/pyramidal_appended.csv",T)->dump
 read.csv("NeuronDataMaster.csv",T)->colmaster
+
+
+setwd("~/NeuroMiner/data_sets/Neuron_subsets")
+temp =list.files(pattern="../*.csv")
+myfiles<-lapply(temp, function(x) read.csv(x,header=TRUE))
+names(myfiles)<-temp
+
+
+#### fxns 
+#########
+mkdirs <- function(fp) {
+  if(!file.exists(fp)) {
+    mkdirs(dirname(fp))
+    dir.create(fp)
+  }
+}
+
+`cftf` <- function(x,z,y,k=8,L,U,learn=c("RF","SVM"),type=c(NA,0,1),verbose=FALSE,...){
+    ### test data
+   # k=5
+  #  learn="RF"
+  #  type=1
+  #  verbose=FALSE
+    ###
+    
+    ###check data
+
+  if(missing(learn))
+    learn="RF"
+  learn=toupper(learn)
+  if(missing(type))
+    type=NA
+  ctype=type
+  if(!is.na(type)){
+    type=c("left","right")[type+1] #if type=1 then right
+  }
+  else {type="none"}
+  if(missing(x))
+    stop("x view must be supplied")
+  if(missing(z))
+    stop("z view must be supplied")
+  if(missing(y))
+    stop("y response must be supplied")
+  
+#   if(is.factor(y)){
+#     if(nlevels(y)>2)
+#       stop("Currently only works for binary response")
+#     y=c(0,1)[as.numeric(y)]
+#   }
+    
+
+  x=as.data.frame(x)
+  z=as.data.frame(z)
+
+  n=dim(x)[1]
+  if(n!=dim(z)[1])
+    stop("x,z must have same number of observations, i.e. dim(x)[1]=dim(z)[1]")
+  if(n!=length(y))
+    stop("y must have same length as x,z, with y[U]=0 (technically anything)")
+  if(length(L)>n)
+    if((length(L)+length(U))!=n)
+      stop("Error:  length(L)+length(U)!= dim(x)[1]")
+  
+  if(learn=="SVM"){
+    ans=ftf.svm.ctrain(x,z,y,k,L,U,type=type,verbose=verbose)
+  }
+  if(learn=="RF"){
+    ans=ftf.rf.ctrain(x,z,y,k,L,U,type=type,verbose=verbose,...) #the ellipses make no sense here
+    #ans=ftf.rf.ctrain(x,z,y,k,L,U,type=type,verbose=verbose)
+  }
+  obj=structure(list(model=ans,learn=learn,type=ctype,m=length(L),n=n),class="cftf")
+  obj
+}
+
+`ftf.rf.ctrain`<-function(x,z,y,k=30,L,U,
+                          type=c("none","left","right"),
+                          verbose=FALSE,...){
+  f<-function(a1,a2){
+    vec<-apply(cbind(apply(a1,1,max),apply(a2,1,max)),1,which.max)
+    ans<-rep(0,dim(a1)[1])
+    ans[vec==1]<-a1[vec==1,2]
+    ans[vec==2]<-a2[vec==2,2]
+    list(ans,vec)
+  }
+  if(type=="left"){
+    f<-function(a1,b1){
+      vec<-apply(cbind(a1[,1],a2[,1]),1,which.max)
+      ans<-rep(0,dim(a1)[1])
+      ans[vec==1]<-a1[vec==1,2]
+      ans[vec==2]<-a2[vec==2,2]
+      list(ans,vec)
+    }
+  }
+  
+  #need to make the following work for the three measurements
+  # tree, scholl and l-measure
+  if(type=="right"){
+    f<-function(a1,b1){
+      vec<-apply(cbind(a1[,2],a2[,2]),1,which.max)
+      ans<-rep(0,dim(a1)[1])
+      ans[vec==1]<-a1[vec==1,2]
+      ans[vec==2]<-a2[vec==2,2]
+      list(ans,vec)
+    }
+  }
+  
+  #add 3rd here
+  gx<-randomForest(y~.,data=data.frame(y=as.factor(y),x)[L,],...)
+  gz<-randomForest(y~.,data=data.frame(y=as.factor(y),z)[L,],...)
+  
+  #gx<-randomForest(y~.,data=data.frame(y=as.factor(y),x)[L,])
+  #gz<-randomForest(y~.,data=data.frame(y=as.factor(y),z)[L,])
+  
+  
+  a1<-predict(gx,x,type="prob")
+  a2<-predict(gz,z,type="prob")
+  
+  pa1=f(a1,a2)
+  pnow=pa1[[1]]
+  vecind=pa1[[2]]
+  porig<-pnow
+  yval<-as.numeric(pnow>=0.5)
+  conv=100
+  t1<-proc.time()
+  if(k>1){
+    for(i in 1:k){
+      ptemp=pnow
+      pnow[L]=y[L]
+      gx<-randomForest(y~.,data=data.frame(y=pnow,x),...)
+      gz<-randomForest(y~.,data=data.frame(y=pnow,z),...)
+      a1<-as.vector(predict(gx,x))
+      a2<-as.vector(predict(gz,z))
+      a1=cbind(1-a1,a1)
+      a2=cbind(1-a2,a2)
+      
+      if(any(a1>1))
+        a1[a1>1]=1
+      if(any(a1<0))
+        a1[a1<0]=0
+      if(any(a2>1))
+        a2[a2>1]=1
+      if(any(a2<0))
+        a2[a2<0]=0
+      
+      pa1=f(a1,a2)
+      pnow=pa1[[1]]
+      vecind=pa1[[2]]
+      yval<-as.numeric(pnow>0.5)
+      conv= mean((ptemp-pnow)^2)
+      
+      if(verbose){
+        cat("i=",i," conv=",conv,"  time=",(proc.time()-t1)/60,"\n")
+      }
+    }
+  }
+  fvec=list(yL=yval[L],yU=yval[U],px=a1,py=a2,gx=gx,gz=gz,iter=k,
+            conv=conv,porig=porig,vecind=vecind)
+  return(fvec)
+}
+
+`kapstat` <-
+  function(tab=diag(2) ){
+    if(dim(tab)[1]==1){
+      return(0)
+    }
+    if(dim(tab)[1]==dim(tab)[2]){
+      rs<-apply(tab,2,sum)
+      cs<-apply(tab,1,sum)
+      N<-sum(rs)
+      E<-sum(rs*cs)/N^2
+      O<-sum(diag(tab))/N
+      return( (O-E)/(1-E) )
+    }
+    return(NA)
+  }
+
+
+
+# loads a csv into a data.frame and cleans data
+process.csv<-function(x)
+{ 
+  ####testing code
+  ##x<-(myfiles[[i]])
+  
+  ### check for number of species in a dataset
+  ###   if dataset contains only 1 species
+  ###   the categorical variable is set to the
+  ###   primary brain region
+  if (nlevels(as.factor(x[,ny]))==1){ny<-15}
+  
+  ### cleaning the dataset
+  x<-x[x$Archive.Name!="McQuiston",]
+  dat<-data.frame(y=as.factor(x[,ny]),x[,c(nx1,nx2,nx3)])
+  dat<-na.omit(dat)
+  dat$Soma.Surface<-as.numeric(dat$Soma.Surface)
+  dat$Gstat.total.cable.length<-as.numeric(dat$Gstat.total.cable.length)
+  dat$Fractal_Dim<-as.numeric(dat$Fractal_Dim)
+  return(dat)  
+}  
+
+try.multinom<-function(pdata,ltemp,numvar)
+{
+  vars<-tail(order(scale(pdata)),numvar)
+  index<-append(vars+1,1,0)
+  scaletemp<-data.frame(apply(ltemp[,c(index[-1])], MARGIN = 2, FUN = function(X) (X - min(X))/diff(range(X))))
+  scaletemp<-cbind(y=ltemp$y,scaletemp)
+  lmeasure<-tryCatch({multinom(y~.,data=scaletemp,maxit=100)},
+                     error=function(err){
+                       lmeasure<-data.frame(deviance<-0)
+                       return<-lmeasure})
+  
+  return(round(lmeasure$deviance,3))
+  
+}
 
 parsecolors<-function(cols)
 {
@@ -42,70 +257,7 @@ parsecolors<-function(cols)
   cols<-makecolors(high)
   return(cols)
 }
-
-#following three functions clean and trim the dataset
-trim.csv<-function(tdata,species)
-{ 
-  ####testing code
-  #x<-funk
-  
-  ### cleaning the dataset
-  #dat<-data.frame(y=as.factor(x[,ny]),x[,-ny])
-  
-  tdata<-na.omit(tdata)
-  tdata<-tdata[tdata$Species.Name==species,]
-  tdata$Species.Name<-factor(tdata$Species.Name)
-  return(tdata)  
-}  
-
-wwo.axon<-function(temp,keep)
-{ 
-  temp<-temp[temp$Structural.Domains==keep,]
-  temp$Structural.Domains<-factor(temp$Structural.Domains)
-  return(temp)  
-} 
-
-process.age<-function(temp,age=18)
-{
-  temp<-temp[temp$Min.Age!=c("Not reported"),]
-  temp$Min.Age<-factor(temp$Min.Age)
-  
-  temp$Min.Age<-as.numeric(temp$Min.Age)
-  temp<-temp[temp$Min.Age>age,]
-  return(temp)
-}
-
-process.csv<-function(x,ny)
-{ 
-  ####testing code
-  ##x<-(myfiles[[i]])
-  
-  ### check for number of species in a dataset
-  ###   if dataset contains only 1 species
-  ###   the categorical variable is set to the
-  ###   primary brain region
-  if (nlevels(as.factor(x[,ny]))==1){ny<-15}
-  
-  ### cleaning the dataset
-  x<-x[x$Archive.Name!="McQuiston",]
-  dat<-data.frame(y=as.factor(x[,ny]),x[,c(nx1,nx2,nx3)])
-  dat<-na.omit(dat)
-  dat$Soma.Surface<-as.numeric(dat$Soma.Surface)
-  dat$Gstat.total.cable.length<-as.numeric(dat$Gstat.total.cable.length)
-  dat$Fractal_Dim<-as.numeric(dat$Fractal_Dim)
-  return(dat)  
-}  
-
-#check this
-#####
-mkdirs <- function(fp)
-{
-  if(!file.exists(fp)) {
-    mkdirs(dirname(fp))
-    dir.create(fp)
-  }
-}
-
+# prints to screen
 print.err<-function(rfor,subj,fname)
 {
   last<-end(rfor$err.rate)[1]
@@ -348,38 +500,128 @@ save.time<-function(fname)
 #####
 ## batch processing
 ##############
-# nx1<-33:96
-# nx2<-97:110
-# nx3<-111:159
-# ny<-4
+nx1<-33:96
+nx2<-97:110
+nx3<-111:159
+###try
+#ny<-15
+###original
+ny<-4
+#coldat<-process.csv(colmaster)
+#cols=rainbow(length(unique(temp1[,1]))+2)
+#cols=parsecolors(cols)
 
 
-species<-c("C. elegans","mouse",
-           "rat","human")
+index=1:18
 
-rdata<-read.csv("NeuronDataMaster.csv",T)
+#z[-c(4,5,6,7,8,12,13,15,16)]
+#z[-c(4)]
+### for the time being we omit drosphilia, its a small dataset n=18
 
-rawdata<-trim.csv(rdata,species)
+varimp<-array(NA,dim=c(1,10))
 
-rawdata<-process.age(rawdata,18)
+for (i in index[c(11)])
+{
+  varimp<-array(NA,dim=c(1,10))
+  ftemp<-array(NA,dim=c(1,2))
+  dimnames(ftemp)[[2]]<-c("time (s)","OOB")
+  
+  i=11
+  #i=1
+  #temp1<-process.csv(myfiles[[1]])
+  temp1<-process.csv(myfiles[[i]])
+  
+  
+  nxx1<-2:65
+  nxx2<-66:79
+  nxx3<-81:dim(temp1)[2] #80 is Sholl.1 should always be 1
+  
+  cols=rainbow(length(unique(temp1[,1]))+2)
+  
+  ###comment out if running single species
+  cols=parsecolors(cols)
 
-noaxon<-wwo.axon(rawdata,c("Dendrites, Soma, No Axon"))
-waxon<-wwo.axon(rawdata,c("Dendrites, Soma, Axon"))
+  n<-length(temp1$y)
+  
+  ## Set L and U  (P=60)
+  set.seed(100)
+  y<-temp1$y
+  L=sample(1:n,ceiling(n*0.6))    #60% sample
+  U=setdiff(1:n,L)                #the other #%40
+  y[U]=NA                         #drops 
+  
+  
+  ## Exectute co-FTF_1( Random Forest)  takes about 5 minutes
+  crf<-cftf(x=temp1[,c(nxx1)],z=temp1[,c(nxx2)],y=y,k=5,L,U,learn="RF",type=1,verbose="T")
+  
+  
+#   y=pharm$class
+#   x=pharm$bio
+#   z=pharm$chem
+#   x=na.roughfix(x)  ##fix NA's
+#   n<-length(y)
+#   
+  
+  y[U]=temp1$y[U]
+  tabrf=table(crf$model$yU,y[U])
+  sum(diag(tabrf))/sum(tabrf)
+  kapstat(tabrf)
+  
+  crf1<-cftf(x=temp1[,c(nxx1)],z=temp1[,c(nxx2)],y,k=1,1:n,NULL,learn="RF",type=1,local=TRUE)
+  
+  ## Necessary processing for plot
+  nvar=15  
+  gx=crf1$model$gx
+  gz=crf1$model$gz
+  vecind<-crf1$model$vecind
+  xvar<-apply(gx$local[,vecind==1],1,sum)
+  zvar<-apply(gz$local[,vecind==2],1,sum)
+  rfv<-sort(c(xvar,zvar),dec=TRUE)[nvar:1]
+  
+  ## Make plot
+  dotchart(rfv,main=expression("Co-FTF"[1]*" with Random Foest"),
+           xlab="Variable Score",cex=1.2,pch=16)
 
+  
+  
+  
+  
+  
+  
+  
+  
 
-
-
-
-write.csv(rawdata, "FourSpecies18over.csv", row.names=FALSE, na="")
-write.csv(noaxon, "FourSpeciesNoAxon18over.csv", row.names=FALSE, na="")
-write.csv(waxon, "FourSpeciesWithAxon18over.csv",row.names=FALSE, na="")
-
-#test code
-# levels(rawdata$Structural.Domains)
-# levels(noaxon$Structural.Domains)
-# levels(waxon$Structural.Domains)
-
-alldat<-process.csv(rawdata,ny=1)
-noaxon<-process.csv(noaxon,ny=1)
-waxon<-process.csv(waxon,ny=1)
+  ptm<-proc.time()[3]
+  set.seed(100)
+  g3rf<-randomForest(y~.,data=temp1[,c(1,nxx3)])##,prox=TRUE)
+  ftime[5]<-round(proc.time()[3]-ptm,4);names(ftime)[5]<-("Sholl random forest")
+  
+  v3rf<-varImpPlot(g3rf)
+  last<-end(g3rf$err.rate)[1]
+  OOB<-round(mean(g3rf$err.rate[last,1]),3)
+  ftemp<-rbind(ftemp,c(ftime[[5]],OOB))
+  row.names(ftemp)[nrow(ftemp)]<-names(ftime)[5]
+  
+  ptm<-proc.time()[3]
+  set.seed(100)
+  g3pls<-nipal(as.matrix(temp1[,c(nxx3)]),as.numeric(temp1$y),40)
+  v3pls<-vip(g3pls,as.numeric(temp1$y),names(temp1[,c(nxx3)]))
+  ftime[6]<-round(proc.time()[3]-ptm,4);names(ftime)[6]<-("Sholl analysis PLS")
+  
+  
+  ftemp<-rbind(ftemp,c(ftime[[6]],NA))
+  row.names(ftemp)[nrow(ftemp)]<-names(ftime)[6]
+  
+  #print.err(g3,"Sholl analysis","NeuronDataMaster")
+  #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
+  save.err(g3rf,"Sholl analysis",names(myfiles[i]),counts)
+  PLSvRF(v3rf,v3pls,"Sholl analysis",names(myfiles[i]),temp1[,c(nxx3)])
+  varimp<-save.PLSvRF(v3rf,v3pls,"Sholl analysis",names(myfiles[i]),temp1[,c(nxx3)])
+  
+  
+  
+  save.IMP(names(myfiles[i]))
+  save.time(names(myfiles[i]))
+  
+}
 
