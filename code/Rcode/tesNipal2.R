@@ -386,6 +386,21 @@ save.PLSvRF<-function(vrf,vpls,subj,fname,dat)
   return(varimp)
 }
 
+save.CoFTFRF<-function(rfv,fname)
+{
+  loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
+  mkdirs(loc)
+  pdf(file=paste(loc, substr(fname,1,nchar(fname)-4), "CoFTFRF.pdf",sep=""), width=11, 
+      height=8.5, pointsize=12,bg="transparent")
+  
+  dotchart(rfv,main=expression("Co-FTF"[1]*" with Random Forest"),
+           xlab="Variable Score",cex=1.2,pch=16)
+  
+  dev.off()
+}
+
+
+
 nipal<-function(x,y,k)
 {
   x<-scale(x,,scale=FALSE)
@@ -437,7 +452,6 @@ save.IMP<-function(fname)
   pdf(file=paste(loc, substr(fname,1,nchar(fname)-4), "VARIMP.pdf",sep=""), width=11, 
       height=8.5, pointsize=12,bg="transparent")
   
-  
   #  texfile <- paste(loc,substr(fname,1,nchar(fname)-4),'.pdf',sep="")
   cnames<-c("rf","rf","rf","rf","rf",
             "pls","pls","pls","pls","pls")
@@ -452,56 +466,8 @@ save.IMP<-function(fname)
   textplot(xtable(varimp[-1,6:10]))
   
   dev.off()
-  
-  #   tt <- print(xtable(varimp[-1,]), type='latex')
-  #   
-  #   print(xtable(varimp[-1,]), type='latex')
-  #   
-  #   texfile <- paste(loc,substr(fname,1,nchar(fname)-4),'.tex',sep="")
-  #   cat(
-  #     '\\documentclass[12pt]{report}
-  #       \\usepackage[landscape]{geometry}
-  #       \\date{}
-  #       \\begin{document}', tt, '\\end{document}', sep='', 
-  #     file=texfile
-  #   )
-  #   ## pdflatex from texlive package for linux converts .tex to .pdf
-  #   
-  #   tools::texi2dvi(texfile, pdf = TRUE, clean = TRUE)
-  #   tools::texi2pdf(texfile,  clean = TRUE)
-  
-  
-  
-  
-  
-  #   # show R version information
-  #   textplot(version)
-  #   # show the alphabet as a single string
-  #   textplot( paste(letters[1:26], collapse=" ") )
-  #   
-  #   # show the alphabet as a matrix 
-  #   textplot( matrix(letters[1:26], ncol=2))
-  #   
-  #   ### Make a nice 4 way display with two plots and two text summaries 
-  #   data(iris)  
-  #   par(mfrow=c(2,2))   
-  #   plot( Sepal.Length ~ Species, data=iris, border="blue", col="cyan",   
-  #         main="Boxplot of Sepal Length by Species" )    
-  #   plotmeans(Sepal.Length ~ Species, data=iris, barwidth=2, connect=FALSE,
-  #             main="Means and 95\% Confidence Intervals\nof Sepal Length by Species")
-  #   
-  #   info <- sapply(split(iris$Sepal.Length, iris$Species),
-  #                  function(x) round(c(Mean=mean(x), SD=sd(x), N=gdata::nobs(x)),2))
-  #   
-  #   textplot( info, valign="top"  )
-  #   title("Sepal Length by Species")
-  #   
-  #   reg <- lm( Sepal.Length ~ Species, data=iris )
-  #   textplot( capture.output(summary(reg)), valign="top")
-  #   title("Regression of Sepal Length by Species")
-  #   
-  #   par(mfrow=c(1,1))
 }
+
 
 save.time<-function(fname)
 {
@@ -545,9 +511,8 @@ for (i in index[c(11)])
   
   i=11
   #i=1
-  #temp1<-process.csv(myfiles[[1]])
-  temp1<-process.csv(myfiles[[i]])
   
+  temp1<-process.csv(myfiles[[i]])
   
   nxx1<-2:65
   nxx2<-66:79
@@ -566,17 +531,14 @@ for (i in index[c(11)])
   L=sample(1:n,ceiling(n*0.6))    #60% sample
   U=setdiff(1:n,L)                #the other #%40
   y[U]=NA                         #drops 
-  x=temp1[,c(nxx1)]
-  z=temp1[,c(nxx2)]
-  w=temp1[,c(nxx3)]
-  
-  
-  
-  
+#   x=temp1[,c(nxx1)]
+#   z=temp1[,c(nxx2)]
+#   w=temp1[,c(nxx3)]
+#   
   
   ## Exectute co-FTF_1( Random Forest)  takes about 5 minutes
   #change k back to 5
-  crf<-cftf(x=temp1[,c(nxx1)],z=temp1[,c(nxx2)],w=temp1[,c(nxx3)],y=y,k=2,L,U,learn="RF",type=1,verbose="T")
+  crf<-cftf(x=temp1[,c(nxx1)],z=temp1[,c(nxx2)],w=temp1[,c(nxx3)],y=y,k=5,L,U,learn="RF",type=1,verbose="T")
   
   
   #   y=pharm$class
@@ -605,50 +567,16 @@ for (i in index[c(11)])
   wvar<-apply(gw$local[,vecind==3],1,sum)
   rfv<-sort(c(xvar,zvar,wvar),dec=TRUE)[nvar:1]
   
+  
+  save.CoFTFRF(rfv,names(myfiles[i]))
   ## Make plot
-  dotchart(rfv,main=expression("Co-FTF"[1]*" with Random Foest"),
-           xlab="Variable Score",cex=1.2,pch=16)
+#   dotchart(rfv,main=expression("Co-FTF"[1]*" with Random Foest"),
+#            xlab="Variable Score",cex=1.2,pch=16)
+#   
   
   
   
-  
-  
-  
-  
-  
-  
-  
-  ptm<-proc.time()[3]
-  set.seed(100)
-  g3rf<-randomForest(y~.,data=temp1[,c(1,nxx3)])##,prox=TRUE)
-  ftime[5]<-round(proc.time()[3]-ptm,4);names(ftime)[5]<-("Sholl random forest")
-  
-  v3rf<-varImpPlot(g3rf)
-  last<-end(g3rf$err.rate)[1]
-  OOB<-round(mean(g3rf$err.rate[last,1]),3)
-  ftemp<-rbind(ftemp,c(ftime[[5]],OOB))
-  row.names(ftemp)[nrow(ftemp)]<-names(ftime)[5]
-  
-  ptm<-proc.time()[3]
-  set.seed(100)
-  g3pls<-nipal(as.matrix(temp1[,c(nxx3)]),as.numeric(temp1$y),40)
-  v3pls<-vip(g3pls,as.numeric(temp1$y),names(temp1[,c(nxx3)]))
-  ftime[6]<-round(proc.time()[3]-ptm,4);names(ftime)[6]<-("Sholl analysis PLS")
-  
-  
-  ftemp<-rbind(ftemp,c(ftime[[6]],NA))
-  row.names(ftemp)[nrow(ftemp)]<-names(ftime)[6]
-  
-  #print.err(g3,"Sholl analysis","NeuronDataMaster")
-  #counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
-  save.err(g3rf,"Sholl analysis",names(myfiles[i]),counts)
-  PLSvRF(v3rf,v3pls,"Sholl analysis",names(myfiles[i]),temp1[,c(nxx3)])
-  varimp<-save.PLSvRF(v3rf,v3pls,"Sholl analysis",names(myfiles[i]),temp1[,c(nxx3)])
-  
-  
-  
-  save.IMP(names(myfiles[i]))
-  save.time(names(myfiles[i]))
+
   
 }
 
