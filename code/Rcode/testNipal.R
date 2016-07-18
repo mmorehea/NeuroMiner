@@ -543,6 +543,59 @@ for (i in index[c(11)])
 
   n<-length(temp1$y)
   
+  
+  #test df
+#####
+  set.seed(100)
+  X1<-runif(20,0,1)
+  lX2<-2*X1
+  X2<-runif(length(X1),.5,1)
+  #    colX2<-X1
+  #    colX2[X1>.5]<-X1[X1>.5]-.3
+  X3<-rnorm(length(X1),.5,.5)
+  X4<-rnorm(length(X1),.5,.5)
+  Y1<-rep(0,length(X1))
+  Y1[X1>.5]<-1
+  Y2<-Y1
+  Y2[3]<-0
+  
+  lindf<-data.frame(Y1,Y2,X1,lX2,X3,X4)
+  nldf<-data.frame(Y1,Y2,X1,X2,X3,X4)
+  
+  #following two pls Y1=1 if X1>.5 and Y1=0 otherwise
+  #matrix with collinearities LX2=X1
+  set.seed(100)
+  lpls<-nipal(as.matrix(lindf[,c(3,4,5,6)]),as.numeric(lindf$Y1),40)
+  vlpls<-vip(lpls,as.numeric(lindf$Y1),names(lindf[,c(3,4,5,6)]))
+  
+  #matrix without lX2 
+  set.seed(100)
+  lpls<-nipal(as.matrix(lindf[,c(3,5,6)]),as.numeric(lindf$Y1),40)
+  vlpls<-vip(lpls,as.numeric(lindf$Y1),names(lindf[,c(3,5,6)]))
+  
+  #Y2=Y1 except Y2[3]=0 same as first run
+  set.seed(100)
+  lpls<-nipal(as.matrix(lindf[,c(3,4,5,6)]),as.numeric(lindf$Y2),40)
+  vlpls<-vip(lpls,as.numeric(lindf$Y2),names(lindf[,c(3,4,5,6)]))
+
+  # no collinearities fit to Y1
+  set.seed(100)
+  nlpls<-nipal(as.matrix(nldf[,c(3,4,5,6)]),as.numeric(nldf$Y1),40)
+  vnlpls<-vip(nlpls,as.numeric(nldf$Y1),names(nldf[,c(3,4,5,6)]))
+
+  # no collinearities fit to Y2
+  set.seed(100)
+  nlpls<-nipal(as.matrix(nldf[,c(3,4,5,6)]),as.numeric(nldf$Y2),40)
+  vnlpls<-vip(nlpls,as.numeric(nldf$Y2),names(nldf[,c(3,4,5,6)]))
+  #####
+
+#   
+#   colpls<-nipal(as.matrix(lindf[,-c(3)]),as.numeric(lindf$Y1),40)
+#   vcolpls<-vip(lpls,as.numeric(lindf$Y1),names(lindf[,-c(1,3)]))
+#   
+  
+
+  
   ## Set L and U  (P=60)
   set.seed(100)
   y<-temp1$y
@@ -550,59 +603,11 @@ for (i in index[c(11)])
   U=setdiff(1:n,L)                #the other #%40
   y[U]=NA                         #drops 
   
-  
-  ## Exectute co-FTF_1( Random Forest)  takes about 5 minutes
-  crf<-cftf(x=temp1[,c(nxx1)],z=temp1[,c(nxx2)],y=y,k=5,L,U,learn="RF",type=1,verbose="T")
-  
-  
-#   y=pharm$class
-#   x=pharm$bio
-#   z=pharm$chem
-#   x=na.roughfix(x)  ##fix NA's
-#   n<-length(y)
-#   
-  
-  y[U]=temp1$y[U]
-  tabrf=table(crf$model$yU,y[U])
-  sum(diag(tabrf))/sum(tabrf)
-  kapstat(tabrf)
-  
-  crf1<-cftf(x=temp1[,c(nxx1)],z=temp1[,c(nxx2)],y,k=1,1:n,NULL,learn="RF",type=1,local=TRUE)
-  
-  ## Necessary processing for plot
-  nvar=15  
-  gx=crf1$model$gx
-  gz=crf1$model$gz
-  vecind<-crf1$model$vecind
-  xvar<-apply(gx$local[,vecind==1],1,sum)
-  zvar<-apply(gz$local[,vecind==2],1,sum)
-  rfv<-sort(c(xvar,zvar),dec=TRUE)[nvar:1]
-  
-  ## Make plot
-  dotchart(rfv,main=expression("Co-FTF"[1]*" with Random Foest"),
-           xlab="Variable Score",cex=1.2,pch=16)
-
-  
-  
-  
-  
-  
+ 
   
   
   
 
-  ptm<-proc.time()[3]
-  set.seed(100)
-  g3rf<-randomForest(y~.,data=temp1[,c(1,nxx3)])##,prox=TRUE)
-  ftime[5]<-round(proc.time()[3]-ptm,4);names(ftime)[5]<-("Sholl random forest")
-  
-  v3rf<-varImpPlot(g3rf)
-  last<-end(g3rf$err.rate)[1]
-  OOB<-round(mean(g3rf$err.rate[last,1]),3)
-  ftemp<-rbind(ftemp,c(ftime[[5]],OOB))
-  row.names(ftemp)[nrow(ftemp)]<-names(ftime)[5]
-  
-  ptm<-proc.time()[3]
   set.seed(100)
   g3pls<-nipal(as.matrix(temp1[,c(nxx3)]),as.numeric(temp1$y),40)
   v3pls<-vip(g3pls,as.numeric(temp1$y),names(temp1[,c(nxx3)]))

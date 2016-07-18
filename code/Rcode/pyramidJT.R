@@ -337,7 +337,7 @@ save.time<-function(fname)
 
 #####
 ## batch processing
-##############
+#####
 nx1<-33:96
 nx2<-97:110
 nx3<-111:159
@@ -358,7 +358,7 @@ z=1:18
 
 varimp<-array(NA,dim=c(1,10))
 
-for (i in z[c(11)])
+for (i in z[c(9,10,11,12,13,14,15)])
 {
   varimp<-array(NA,dim=c(1,10))
   ftemp<-array(NA,dim=c(1,3))
@@ -551,6 +551,7 @@ save.time(names(myfiles[i]))
 }
 
 OOB=round(mean(gtotrf$err.rate[last,1])
+#####
 ######end batch
 ###############
 
