@@ -81,9 +81,13 @@ os.chdir('..'); os.chdir('..')
 url_template = 'http://neuromorpho.org/{name}'
 
 names = []
-names_complete = pickle.load(open('./prior/names/names_list.p', 'rb'))
-names_somadend = pickle.load(open('./prior/names/names_list_somadend.p', 'rb'))
-names = names_complete + names_somadend
+
+# From prior set:
+# names_complete = pickle.load(open('./prior/names/names_list.p', 'rb'))
+# names_somadend = pickle.load(open('./prior/names/names_list_somadend.p', 'rb'))
+# names = names_complete + names_somadend
+
+names = pickle.load(open('./code/python/names/names_list_complete.p', 'rb'))
 
 # TESTING-------------------------------------------------------------------
 #testFirst = 25
