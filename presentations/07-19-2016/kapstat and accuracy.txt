@@ -1,0 +1,25 @@
+
+two species
+
+>   y[U]=temp1$y[U]
+>   tabrf=table(crf$model$yU,y[U])
+>   sum(diag(tabrf))/sum(tabrf)
+[1] 0.2783696
+>   kapstat(tabrf)
+[1] 0
+>   
+>   
+>   crf1<-cftf(x=temp1[,c(nxx1)],z=temp1[,c(nxx2)],w=temp1[,c(nxx3)],y,k=1,1:n,NULL,learn="RF",type=1,local=TRUE)
+>   
+
+
+
+four species
+
+ y[U]=temp1$y[U]
+>   tabrf=table(crf$model$yU,y[U])
+>   sum(diag(tabrf))/sum(tabrf)
+[1] 0.01196097
+>   kapstat(tabrf)
+[1] 0
+>   

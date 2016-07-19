@@ -1,47 +1,10 @@
-library(randomForest)
-library(calibrate)
+
 library(gplots)
 library(plyr)
 library(xtable)
-library(VGAM)
-library(nnet)
 setwd("~/NeuroMiner/data_sets")
 #read.csv("../first_subsets/pyramidal_appended.csv",T)->dump
 read.csv("NeuronDataMaster.csv",T)->colmaster
-
-parsecolors<-function(cols)
-{
-  makecolors<-function(x)
-  {
-    # x<-low
-    ctemp<-paste(pal(length(x)),"FF",sep="")
-    ###working
-    #tf<-levels(dat[,1])%in%x
-    #test
-    tf<-levels(temp1[,1])%in%x
-    tf<-c(FALSE,tf,FALSE)
-    cols[tf]<-ctemp
-    return(cols)
-  }
-  low<-c("blowfly","C. elegans","drosophila melanogaster",
-         "moth","spiny lobster")
-  medium<-c("chicken","frog","goldfish","guinea pig","manatee",
-            "mouse","pouched lamprey","proechimys","rabbit",
-            "rat","salamander","zebrafish")
-  high<-c("bottlenose dolphin","cat","chimpanzee","clouded leopard",
-          "domestic pig","elephant","giraffe","human","humpback whale",
-          "minke whale","monkey","sheep","Siberian tiger")
-  
-  pal<-colorRampPalette(c("rosybrown4","red3"))
-  cols<-makecolors(low)
-  pal<-colorRampPalette(c("grey","blue"))
-  cols<-makecolors(medium)
-  #pal<-colorRampPalette(c("black","chartreuse"))
-  #pal<-colorRampPalette(c("black","chartreuse","black"))
-  pal<-colorRampPalette(c("darkgreen","green","palegreen"))
-  cols<-makecolors(high)
-  return(cols)
-}
 
 #following three functions clean and trim the dataset
 trim.csv<-function(tdata,species)
@@ -51,9 +14,42 @@ trim.csv<-function(tdata,species)
   
   ### cleaning the dataset
   #dat<-data.frame(y=as.factor(x[,ny]),x[,-ny])
+  #tdata<-rdata
   
   tdata<-na.omit(tdata)
-  tdata<-tdata[tdata$Species.Name==species,]
+  
+  #suppress the warnings due to NAs generated
+  
+  #rdata[rdata$Species.Name==species][4]
+#   dim(tdata[tdata$Species.Name=="C. elegans",][4])
+#   dim(tdata[tdata$Species.Name=="mouse",][4])
+#   dim(tdata[tdata$Species.Name=="rat",][4])
+#   dim(tdata[tdata$Species.Name=="human",][4])
+
+
+  #rdata[rdata$Species.Name==species,][4]
+  #rdata[rdata$Species.Name=="C.elegans"|rdata$Species.Name=="rat"|rdata$Species.Name=="mouse"|rdata$Species.Name=="human",]
+  
+  #suppressWarnings(tdata<-tdata[tdata$Species.Name==species,])
+  #suppressWarnings(tdata<-tdata[tdata$Species.Name=="C.elegans"|tdata$Species.Name=="rat"|tdata$Species.Name=="mouse"|tdata$Species.Name=="human",])
+  
+  tdata<-tdata[tdata$Species.Name=="C. elegans"|tdata$Species.Name=="rat"|tdata$Species.Name=="mouse"|tdata$Species.Name=="human",]
+  tdata$Species.Name<-factor(tdata$Species.Name)
+
+  str(tdata$Species.Name)
+  return(tdata)  
+}  
+
+trimspec.csv<-function(tdata,species)
+{ 
+  tdata<-na.omit(tdata)
+  
+  #rdata[rdata$Species.Name==species][4]
+  #rdata[rdata$Species.Name==species,][4]
+  #rdata[rdata$Species.Name=="rat"|rdata$Species.Name=="human",]
+  
+  #suppressWarnings(tdata<-tdata[tdata$Species.Name==species,])
+  suppressWarnings(tdata<-tdata[tdata$Species.Name=="rat"|tdata$Species.Name=="human",])
   tdata$Species.Name<-factor(tdata$Species.Name)
   return(tdata)  
 }  
@@ -68,7 +64,7 @@ wwo.axon<-function(temp,keep)
 process.age<-function(temp,age=18)
 {
   temp<-temp[temp$Min.Age!=c("Not reported"),]
-  temp$Min.Age<-factor(temp$Min.Age)
+  #temp$Min.Age<-factor(temp$Min.Age)
   
   temp$Min.Age<-as.numeric(temp$Min.Age)
   temp<-temp[temp$Min.Age>age,]
@@ -106,244 +102,7 @@ mkdirs <- function(fp)
   }
 }
 
-print.err<-function(rfor,subj,fname)
-{
-  last<-end(rfor$err.rate)[1]
-  mains<-paste(subj, ", OOB=",round(mean(rfor$err.rate[last,1]),3))  
-  matplot(rfor$err.rate,lwd=2,col=cols,lty=1,type="l",main=mains,
-          sub=fname, cex.sub=.7)
-  #label err rates at 100
-  hund<-rep(100,dim(rfor$err.rate)[2])
-  textxy(hund,rfor$err.rate[100,],round(rfor$err.rate[100,],2))
-  
-  legend("bottomright",inset=.05,legend=colnames(rfor$err.rate),
-         cex=.7,col=cols,lty=1,lwd=3)
-  
-  ##MAP cols to dimnames(g$err.rate)[[2]]
-  varImpPlot(rfor, main=subj,sub=fname,cex.sub=.7)
-}
 
-# prints to pdf
-save.err<-function(rfor,subj,fname,counts)
-{
-  last<-end(rfor$err.rate)[1]
-  mains<-paste(subj, ", OOB = ",round(mean(rfor$err.rate[last,1]),3),sep="")
-  loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
-  mkdirs(loc)
-  
-  #   png(filename=paste(subj, substr(fname,1,nchar(fname)-4), "1.png"), units="px", width=1024, 
-  #       height=768, pointsize=12, res=72)
-  
-  pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "1.pdf"), width=11, 
-      height=8.5, pointsize=12)
-  matplot(rfor$err.rate,lwd=2,col=cols,lty=c(1,2,4,6),type="l",
-          main=mains, cex.main=1.2,font.main=1,
-          sub=fname, cex.sub=.7,ylab="Error rate (%)",xlab="# of trees")
-  
-  #   plot(vpls,vrf,main=paste(subj,", PLS vs. RF variable importance"),font.main=1,
-  #        cex.main=1.2,sub=fname,cex.sub=.8,
-  #        ylab="RF (Variable Score)",xlab="PLS (Variable Score)",
-  #        pch=16,bg="transparent")
-  #label err rates at 100
-  hund<-rep(100,dim(rfor$err.rate)[2])
-  textxy(hund,rfor$err.rate[100,],round(rfor$err.rate[100,],2), cex=1.2)
-  lname<-paste(colnames(rfor$err.rate),"   n=",counts)
-  legend("bottomright",inset=.05,legend=lname,
-         cex=1,col=cols,lty=c(1,2,4,6),lwd=2,bg="white")
-  dev.off()
-  
-  ##MAP cols to dimnames(g$err.rate)[[2]]
-  #   png(filename=paste(subj,substr(fname,1,nchar(fname)-4), "2.png"), units="px", width=1024, 
-  #       height=768, pointsize=12, res=144)
-  pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "2.pdf"), width=11, 
-      height=8.5, pointsize=12)
-  varImpPlot(rfor, main=paste(subj,", RF variable importance",sep=""),
-             cex.main=1.2,font.main=1,sub=fname,cex.sub=.7,bg="transparent")
-  dev.off()
-}
-
-PLSvRF<-function(vrf,vpls,subj,fname,dat)
-{
-  vrf<-scale(vrf)
-  vpls<-scale(vpls)
-  plot(vpls,vrf,main=subj,sub=fname,cex.sub=.7,
-       ylab="RF (Variable Score)",xlab="PLS (Variable Score)",pch=16,cex.sub=0.8)
-  #x<-as.matrix(dat[,c(nxx1)])
-  x<-as.matrix(dat[,])
-  indpls<-order(vpls)[dim(x)[2]:(dim(x)[2]-4)]
-  indrf<-order(vrf)[dim(x)[2]:(dim(x)[2]-4)]
-  points(vpls[indrf],vrf[indrf],pch=16,cex=2,col="white")
-  text(vpls[indrf],vrf[indrf],row.names(vrf)[indrf],col=gray(0.6))
-  points(vpls[indpls],vrf[indpls],pch=16,cex=2,col="white")
-  text(vpls[indpls],vrf[indpls],row.names(vpls)[indpls],col=gray(0.3))
-  abline(0,1)
-}
-
-save.PLSvRF<-function(vrf,vpls,subj,fname,dat)
-{
-  #   v1rf,v1pls,"L-measure",names(myfiles[i]),temp1[,c(nxx1)]
-  #   vrf<-v1rf
-  #   vpls<-v1pls;subj<-"L-measure"
-  #   fname<-names(myfiles[i]);dat<-temp1[,c(nxx1)]
-  #   
-  loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
-  mkdirs(loc)
-  pdf(file=paste(loc,subj, substr(fname,1,nchar(fname)-4), "PLSvRF.pdf"), width=11, 
-      height=8.5, pointsize=12,bg="transparent")
-  
-  vrf<-scale(vrf)
-  vpls<-scale(vpls)
-  plot(vpls,vrf,main=paste(subj,", PLS vs. RF variable importance",sep=""),font.main=1,
-       cex.main=1.2,sub=fname,cex.sub=.8,
-       ylab="RF (Variable Score)",xlab="PLS (Variable Score)",
-       pch=16,bg="transparent")
-  #x<-as.matrix(dat[,c(nxx1)])
-  x<-as.matrix(dat[,])
-  
-  indpls<-order(vpls)[dim(x)[2]:(dim(x)[2]-4)]
-  indrf<-order(vrf)[dim(x)[2]:(dim(x)[2]-4)]
-  points(vpls[indrf],vrf[indrf],pch=16,cex=2,col="white")
-  text(vpls[indrf],vrf[indrf],row.names(vrf)[indrf],col=gray(0.6))
-  points(vpls[indpls],vrf[indpls],pch=16,cex=2,col="white")
-  text(vpls[indpls],vrf[indpls],row.names(vpls)[indpls],col=gray(0.3))
-  abline(0,1)
-  dev.off()
-  
-  
-  varimp<-rbind(varimp,c(row.names(vrf)[indrf],
-                         row.names(vpls)[indpls]))
-  row.names(varimp)[nrow(varimp)]<-paste(substr(fname,1,nchar(fname)-4),subj)
-  
-  return(varimp)
-}
-
-nipal<-function(x,y,k)
-{
-  x<-scale(x,,scale=FALSE)
-  y<-scale(y,,scale=FALSE)
-  b<-p<-a<-u<-NULL
-  for(i in 1:k){
-    wt<-t(x)%*%y/as.numeric(t(y)%*%x%*%t(x)%*%y)
-    tt<-x%*%wt
-    pt<- t(x)%*%tt/as.numeric(t(tt)%*%tt)
-    ## add tuning parameter gamma if above is zero
-    # would have to be cross validated
-    # example to test
-    npt<-as.numeric(sqrt(t(pt)%*%pt))
-    wn<-npt*wt
-    tn<-npt*tt
-    pn<-pt/npt
-    bn<-as.numeric(t(tn)%*%y)/as.numeric(t(tn)%*%tn)
-    x<-x-tn%*%t(pn)
-    y<-y-bn*tn
-    
-    b<-c(b,bn)
-    p<-cbind(p,pn)
-    a<-cbind(a,wn)
-    u<-cbind(u,tn)
-  }
-  dim(x)[2]->ab
-  return(structure(list(b=b,p=p,a=a,u=u,d=ab,q=k),class="upls"))
-}
-
-vip<-function(obj,y,nm=NULL)
-{
-  if(class(obj)!="upls"){
-    stop("Object is not of type upls")
-  }
-  a1<-as.vector(obj$a^2%*%cor(obj$u,y)^2 )
-  if(is.null(nm)){
-    a2<-1:length(a1)
-    names(a1)<-paste(a2)
-  }else{
-    names(a1)<-nm
-  }
-  return(a1)##sort(a1,decreasing=TRUE))
-}
-
-save.IMP<-function(fname)
-{
-  loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
-  mkdirs(loc)
-  pdf(file=paste(loc, substr(fname,1,nchar(fname)-4), "VARIMP.pdf",sep=""), width=11, 
-      height=8.5, pointsize=12,bg="transparent")
-  
-  
-  #  texfile <- paste(loc,substr(fname,1,nchar(fname)-4),'.pdf',sep="")
-  cnames<-c("rf","rf","rf","rf","rf",
-            "pls","pls","pls","pls","pls")
-  colnames(varimp)<-cnames
-  #knitr::kable(varimp,  caption = "A table produced by printr.")
-  
-  
-  
-  
-  par(mfrow=c(2,1))   
-  textplot( xtable(varimp[-1,1:5]))
-  textplot(xtable(varimp[-1,6:10]))
-  
-  dev.off()
-  
-  #   tt <- print(xtable(varimp[-1,]), type='latex')
-  #   
-  #   print(xtable(varimp[-1,]), type='latex')
-  #   
-  #   texfile <- paste(loc,substr(fname,1,nchar(fname)-4),'.tex',sep="")
-  #   cat(
-  #     '\\documentclass[12pt]{report}
-  #       \\usepackage[landscape]{geometry}
-  #       \\date{}
-  #       \\begin{document}', tt, '\\end{document}', sep='', 
-  #     file=texfile
-  #   )
-  #   ## pdflatex from texlive package for linux converts .tex to .pdf
-  #   
-  #   tools::texi2dvi(texfile, pdf = TRUE, clean = TRUE)
-  #   tools::texi2pdf(texfile,  clean = TRUE)
-  
-  
-  
-  
-  
-  #   # show R version information
-  #   textplot(version)
-  #   # show the alphabet as a single string
-  #   textplot( paste(letters[1:26], collapse=" ") )
-  #   
-  #   # show the alphabet as a matrix 
-  #   textplot( matrix(letters[1:26], ncol=2))
-  #   
-  #   ### Make a nice 4 way display with two plots and two text summaries 
-  #   data(iris)  
-  #   par(mfrow=c(2,2))   
-  #   plot( Sepal.Length ~ Species, data=iris, border="blue", col="cyan",   
-  #         main="Boxplot of Sepal Length by Species" )    
-  #   plotmeans(Sepal.Length ~ Species, data=iris, barwidth=2, connect=FALSE,
-  #             main="Means and 95\% Confidence Intervals\nof Sepal Length by Species")
-  #   
-  #   info <- sapply(split(iris$Sepal.Length, iris$Species),
-  #                  function(x) round(c(Mean=mean(x), SD=sd(x), N=gdata::nobs(x)),2))
-  #   
-  #   textplot( info, valign="top"  )
-  #   title("Sepal Length by Species")
-  #   
-  #   reg <- lm( Sepal.Length ~ Species, data=iris )
-  #   textplot( capture.output(summary(reg)), valign="top")
-  #   title("Regression of Sepal Length by Species")
-  #   
-  #   par(mfrow=c(1,1))
-}
-
-save.time<-function(fname)
-{
-  loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
-  mkdirs(loc)
-  pdf(file=paste(loc, substr(fname,1,nchar(fname)-4), "time.pdf",sep=""), width=11, 
-      height=8.5, pointsize=12,bg="transparent")
-  textplot(xtable(ftemp[-1,]))
-  dev.off()
-  
-}
 
 #####
 ## batch processing
@@ -352,14 +111,23 @@ save.time<-function(fname)
 # nx2<-97:110
 # nx3<-111:159
 # ny<-4
-
+rdata<-read.csv("NeuronDataMaster.csv",T)
 
 species<-c("C. elegans","mouse",
            "rat","human")
-
 rdata<-read.csv("NeuronDataMaster.csv",T)
+###test shit
+#rdata<-rdata[1:20,]
+
+
 
 rawdata<-trim.csv(rdata,species)
+
+species<-c("rat","human")
+
+rawdata<-trimspec.csv(rawdata,species)
+
+
 
 rawdata<-process.age(rawdata,18)
 
@@ -368,9 +136,10 @@ waxon<-wwo.axon(rawdata,c("Dendrites, Soma, Axon"))
 
 
 
+write.csv(rawdata, "TwoSpecies18over.csv", row.names=FALSE, na="")
 
 
-write.csv(rawdata, "FourSpecies18over.csv", row.names=FALSE, na="")
+write.csv(rawdata, "FourSpecies.csv", row.names=FALSE, na="")
 write.csv(noaxon, "FourSpeciesNoAxon18over.csv", row.names=FALSE, na="")
 write.csv(waxon, "FourSpeciesWithAxon18over.csv",row.names=FALSE, na="")
 

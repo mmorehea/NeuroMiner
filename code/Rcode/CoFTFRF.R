@@ -67,8 +67,8 @@ mkdirs <- function(fp) {
   w=as.data.frame(w)
   
   n=dim(x)[1]
-  if(n!=dim(z)[1])
-    stop("x,z must have same number of observations, i.e. dim(x)[1]=dim(z)[1]")
+  if(n!=dim(z)[1] | n!=dim(w)[1])
+    stop("x,z and w must have same number of observations, i.e. dim(x)[1]=dim(z)[1]")
   if(n!=length(y))
     stop("y must have same length as x,z, with y[U]=0 (technically anything)")
   if(length(L)>n)
@@ -119,7 +119,10 @@ mkdirs <- function(fp) {
       list(ans,vec)
     }
   }
+
   
+# test data
+#####
 #   y=y
 #   k=5
 #   learn="RF"
@@ -137,11 +140,13 @@ mkdirs <- function(fp) {
 #   gx<-randomForest(y~.,data=data.frame(y=as.factor(y),x)[L,])
 #   gz<-randomForest(y~.,data=data.frame(y=as.factor(y),z)[L,])
 #   gw<-randomForest(y~.,data=data.frame(y=as.factor(y),w)[L,])
+  #####
   
   
-  
-  
-  #add 3rd here
+
+
+
+
   gx<-randomForest(y~.,data=data.frame(y,x)[L,],...)
   gz<-randomForest(y~.,data=data.frame(y,z)[L,],...)
   gw<-randomForest(y~.,data=data.frame(y,w)[L,],...)
@@ -521,7 +526,7 @@ ny<-4
 #cols=parsecolors(cols)
 
 
-index=1:18
+index=1:30
 
 #z[-c(4,5,6,7,8,12,13,15,16)]
 #z[-c(4)]
@@ -529,15 +534,16 @@ index=1:18
 
 varimp<-array(NA,dim=c(1,10))
 
-for (i in index[c(9,10,11,12,13,14,15)])
+for (i in index[c(28)])
 {
   varimp<-array(NA,dim=c(1,10))
   ftemp<-array(NA,dim=c(1,2))
   dimnames(ftemp)[[2]]<-c("time (s)","OOB")
   
+  i=28
   #i=11
   #i=1
-  
+  i=9
   temp1<-process.csv(myfiles[[i]])
   
   nxx1<-2:65

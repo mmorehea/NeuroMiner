@@ -350,7 +350,7 @@ ny<-4
 #cols=parsecolors(cols)
 
 
-z=1:18
+z=1:28
 
 #z[-c(4,5,6,7,8,12,13,15,16)]
 #z[-c(4)]
@@ -358,12 +358,14 @@ z=1:18
 
 varimp<-array(NA,dim=c(1,10))
 
-for (i in z[c(9,10,11,12,13,14,15)])
+for (i in z[c(9)])
 {
   varimp<-array(NA,dim=c(1,10))
   ftemp<-array(NA,dim=c(1,3))
   dimnames(ftemp)[[2]]<-c("time (s)","OOB","R deviance")
-#i=1
+
+  #i=28
+  #i=1
 #temp1<-process.csv(myfiles[[1]])
 temp1<-process.csv(myfiles[[i]])
 
