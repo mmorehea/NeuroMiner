@@ -3,10 +3,12 @@ Go to code/python and open in terminal. Run each of the following scripts in ord
 # nameListMaker.py
 Input: URL for page with all of the cells - hardcoded in the script
 + If you change the URL, you MUST also delete the file NeuroMiner/data_sets/neuroData.csv AND delete all contents of the folder NeuroMiner/swcs (but keep the empty folder)
+
 Output: NeuroMiner/code/python/names/names_list_complete.p
 
 # NeuroMiner.py
 Input: NeuroMiner/code/python/names/names_list_complete.p - the output of nameListMaker.py
+
 Output:
 + Cell data in NeuroMiner/data_sets/neuroData.csv
 + swc files in NeuroMiner/swcs
@@ -35,17 +37,20 @@ If you are still having problems, run the install commands again with --upgrade 
 
 #swcGrouper.py
 Input: ./swcs/ folder containing all the swcs
+
 Output: ./swcs/ folder with the swcs grouped neatly into folders of 1500 each
 
 #LM.jar and LM2features.py
 Input: swcs in the ./swcs/ folder
-Ouptput: NeuroMiner/data_sets/raw/fixedLmResult.csv
+
+Output: NeuroMiner/data_sets/raw/fixedLmResult.csv
 
 Directions:
 LM.jar can effectively handle only 1500 files at a time. Therefore, run swcGrouper.py to glob all the swcs in ./swcs/ and put them in directories of 1500 each. Then point LM.jar at each one, and name the output files in such a way that you can discern the order, e.g. 1, 2, 3, etc. Then run LM2features.py on each one in turn.
 
 #appender.py
 Input: neuroData.csv, fixedLmResult.csv, and gstats.csv, which should all be in NeuroMiner/data_sets/raw/
+
 Output: appended.csv, the finished appended product
 
 #R things todo
