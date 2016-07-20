@@ -65,9 +65,6 @@ def grabFile(url, name):
     swc_link = [x for x in links if 'Morphology File (Standardized)' in str(x)][0].get('href')
     swc_link = 'http://neuromorpho.org/' + swc_link
 
-    if not os.path.exists('swcs/'):
-        os.makedirs('swcs/')
-
     rq = urllib2.Request(swc_link)
     res = urllib2.urlopen(rq)
     swc = open('swcs/' + name[28:] + '.swc', 'wb')
@@ -131,6 +128,9 @@ while choice not in '123': choice = raw_input("""What do you want to do?
 if choice == '1': grabbing = True; mining = True
 elif choice == '2': grabbing = False; mining = True
 elif choice == '3': grabbing = True; mining = False
+
+if not os.path.exists('swcs/'):
+        os.makedirs('swcs/')
 
 pleaseRun = False
 if grabbing:
