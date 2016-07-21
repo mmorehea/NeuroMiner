@@ -34,7 +34,7 @@ def mine(url):
     printable = set(string.printable)
     for column in columns:
         val = k.ix[column, 'Vals']
-        code.interact(local=locals())
+
         #Change months and years to days
         if column == 'Min Age' or 'Max Age':
             if 'months' in val or 'month' in val:
