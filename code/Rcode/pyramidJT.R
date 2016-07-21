@@ -358,7 +358,7 @@ z=1:28
 
 varimp<-array(NA,dim=c(1,10))
 
-for (i in z[c(9)])
+for (i in z[c(28)])
 {
   varimp<-array(NA,dim=c(1,10))
   ftemp<-array(NA,dim=c(1,3))
