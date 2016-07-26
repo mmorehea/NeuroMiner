@@ -256,8 +256,8 @@ teacc=matrix(0,nrow=L1*lnu,ncol=6)  #accuracy
 tesen=matrix(0,nrow=L1*lnu,ncol=6)  #sensitivity
 tespec=matrix(0,nrow=L1*lnu,ncol=6) #specificity
 
-i=9
-#i=28
+#i=9
+i=28
 nx1<-33:96
 nx2<-97:110
 nx3<-111:159
@@ -270,8 +270,22 @@ t1<-proc.time()
 
 for(j in 1:lnu){
   for(i in 1:L1){
-    L=sample(1:n,ceiling(nu[j]*n))  #training data
-    U=setdiff(1:n,L)  #test data
+    
+    for(index in 1:nlevels(temp1$y)){
+      samp<-which(temp1$y==names(summary(temp1$y))[[index]])
+      if (exists("L")){
+        L<-append(L,sample(samp,ceiling(nu[j]*summary(temp1$y)[[index]])),length(L))
+        U<-append(U,setdiff(samp,L),length(U))
+      }
+      else{
+        L=sample(samp,ceiling(nu[j]*summary(temp1$y)[[index]]))
+        U=setdiff(samp,L)
+      }
+    }
+
+    
+#     L=sample(1:n,ceiling(nu[j]*n))  #training data
+#     U=setdiff(1:n,L)  #test data
     
     
     #grf<-randomForest(y~.,data=temp1[L,c(1,nxx1)])
@@ -301,8 +315,10 @@ for(j in 1:lnu){
     
     cat("nu=",nu[j],"  k3=",k3,"  time=",(proc.time()-t1)/60,"\n")
     k3<-k3+1
+    rm(L)
+    rm(U)
   }
-  write.table(teacc,"te-acc_bio.txt",quote=FALSE,row.names=FALSE,col.names=FALSE)
-  write.table(tespec,"te-spec_bio.txt",quote=FALSE,row.names=FALSE,col.names=FALSE)
-  write.table(tesen,"te-sen_bio.txt",quote=FALSE,row.names=FALSE,col.names=FALSE)
+  write.table(teacc,"te-acc_4bio.txt",quote=FALSE,row.names=FALSE,col.names=FALSE)
+  write.table(tespec,"te-spec_4bio.txt",quote=FALSE,row.names=FALSE,col.names=FALSE)
+  write.table(tesen,"te-sen_4bio.txt",quote=FALSE,row.names=FALSE,col.names=FALSE)
 }
