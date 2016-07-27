@@ -37,4 +37,7 @@ list_of_names = list_of_names + neuron_links
 if not os.path.exists('names/'):
         os.makedirs('names/')
 
+if os.path.exists('names/names_list_complete.p'):
+	    os.remove('names/names_list_complete.p')
+
 pickle.dump(list_of_names, open('names/names_list_complete.p', 'wb'))

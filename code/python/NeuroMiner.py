@@ -65,9 +65,6 @@ def grabFile(url, name):
     swc_link = [x for x in links if 'Morphology File (Standardized)' in str(x)][0].get('href')
     swc_link = 'http://neuromorpho.org/' + swc_link
 
-    if not os.path.exists('swcs/'):
-        os.makedirs('swcs/')
-
     rq = urllib2.Request(swc_link)
     res = urllib2.urlopen(rq)
     swc = open('swcs/' + name[28:] + '.swc', 'wb')
@@ -132,6 +129,9 @@ if choice == '1': grabbing = True; mining = True
 elif choice == '2': grabbing = False; mining = True
 elif choice == '3': grabbing = True; mining = False
 
+if not os.path.exists('swcs/'):
+        os.makedirs('swcs/')
+
 pleaseRun = False
 if grabbing:
 
@@ -152,7 +152,7 @@ if grabbing:
         existing_swcs = glob.glob('./swcs/*.swc')
 
     start_index_swc = len(existing_swcs)
-
+    code.interact(local=locals())
     for cell_number, name in enumerate(names):
         if cell_number < start_index_swc:
             print 'Cell ' + str(cell_number + 1) + ' has already been grabbed.'
