@@ -152,7 +152,7 @@ if grabbing:
         existing_swcs = glob.glob('./swcs/*.swc')
 
     start_index_swc = len(existing_swcs)
-
+    code.interact(local=locals())
     for cell_number, name in enumerate(names):
         if cell_number < start_index_swc:
             print 'Cell ' + str(cell_number + 1) + ' has already been grabbed.'
