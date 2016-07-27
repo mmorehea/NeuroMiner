@@ -7,10 +7,48 @@ library(spa)
 library(randomForest)
 library(rpart)
 library(pls)
-
+library(gplots)
+library(xtable)
 ####
 ## Function Definition
 ####
+mkdirs <- function(fp) {
+  if(!file.exists(fp)) {
+    mkdirs(dirname(fp))
+    dir.create(fp)
+  }
+}
+
+save.metrics<-function(fname)
+{
+  
+  loc<-paste("~/NeuroMiner/presentations/",format(Sys.time(),"%m-%d-%Y"),"/",sep="")
+  mkdirs(loc)
+  
+#   somename<-paste(loc, substr(fname,1,nchar(fname)-4), "-acc.txt",sep="")
+#   write.table(teacc,somename,quote=FALSE,row.names=FALSE,col.names=TRUE)
+#   somename<-paste(loc, substr(fname,1,nchar(fname)-4), "-spec.txt",sep="")
+#   write.table(tespec,somename,quote=FALSE,row.names=FALSE,col.names=T)
+#   somename<-paste(loc, substr(fname,1,nchar(fname)-4), "-sen.txt",sep="")
+#   write.table(tesen,somename,quote=FALSE,row.names=FALSE,col.names=T)
+  
+  somename<-paste(loc, substr(fname,1,nchar(fname)-4), "-acc.pdf",sep="")
+  pdf(file=somename, width=11, 
+      height=8.5, pointsize=12,bg="transparent")
+  textplot(xtable(teacc))
+  dev.off()
+  somename<-paste(loc, substr(fname,1,nchar(fname)-4), "-spec.pdf",sep="")
+  pdf(file=somename, width=11, 
+      height=8.5, pointsize=12,bg="transparent")
+  textplot(xtable(tespec))
+  dev.off()
+  somename<-paste(loc, substr(fname,1,nchar(fname)-4), "-sen.pdf",sep="")
+  pdf(file=somename, width=11, 
+      height=8.5, pointsize=12,bg="transparent")
+  textplot(xtable(tesen))
+  dev.off()  
+}
+
 na.mean<-function(x,...){
   handle.na<-function(x){ #plug the mean into missing values
     x[is.na(x)]<-mean(x,na.rm=TRUE)
@@ -163,80 +201,9 @@ save.err<-function(rfor,subj,fname,counts)
 ####
 ## Read in Data
 ###
-nx1<-33:96
-nx2<-97:110
-nx3<-111:159
-###try
-#ny<-15
-###original
-ny<-4
-#coldat<-process.csv(colmaster)
-#cols=rainbow(length(unique(temp1[,1]))+2)
-#cols=parsecolors(cols)
 
-
-z=1:28
-
-#z[-c(4,5,6,7,8,12,13,15,16)]
-#z[-c(4)]
-### for the time being we omit drosphilia, its a small dataset n=18
-
-varimp<-array(NA,dim=c(1,10))
-
-for (i in z[c(28)])
-{
-  varimp<-array(NA,dim=c(1,10))
-  ftemp<-array(NA,dim=c(1,3))
-  dimnames(ftemp)[[2]]<-c("time (s)","OOB","R deviance")
-  
-  #i=28
-  #i=1
-  #temp1<-process.csv(myfiles[[1]])
-  temp1<-process.csv(myfiles[[i]])
-  
-  
-  nxx1<-2:65
-  nxx2<-66:79
-  nxx3<-81:dim(temp1)[2] #80 is Sholl.1 should always be 1
-  
-  cols=rainbow(length(unique(temp1[,1]))+2)
-  
-  ###comment out if running single species
-  cols=parsecolors(cols)
-  
-  
-  ptm<-proc.time()[3]
-  set.seed(100)
-  g1rf<-randomForest(y~.,data=temp1[,c(1,nxx1)])##,prox=TRUE)
-  ftime<-round(proc.time()[3]-ptm,4);names(ftime)<-("L-measure forest")
-  
-  v1rf<-varImpPlot(g1rf)
-  #dev<-try.multinom(v1rf,temp1,5)
-  dev<-0
-  last<-end(g1rf$err.rate)[1]
-  OOB<-round(mean(g1rf$err.rate[last,1]),3)
-  
-  ftemp<-rbind(ftemp,c(ftime[[1]],OOB,dev))
-  row.names(ftemp)[nrow(ftemp)]<-names(ftime)
-  
-  
-  #dev<-try.multinom(v1pls,temp1,5)
-  ftemp<-rbind(ftemp,c(ftime[[2]],NA,dev))
-  row.names(ftemp)[nrow(ftemp)]<-names(ftime)[2]
-  
-  #print.err(g1rf,"L-measure",names(myfiles[i]))
-  counts<-c(sum(count(temp1$y)[,2]),count(temp1$y)[,2])
-  save.err(g1rf,"L-measure",names(myfiles[i]),counts)
-}
-
-###
-## Fit learner and make plots for each view
-###
-
-##bio
-setwd("~/NeuroMiner/data_sets")
-#read.csv("../first_subsets/pyramidal_appended.csv",T)->dump
-read.csv("NeuronDataMaster.csv",T)->colmaster
+# setwd("~/NeuroMiner/data_sets")
+# read.csv("NeuronDataMaster.csv",T)->colmaster
 
 
 setwd("~/NeuroMiner/data_sets/Neuron_subsets")
@@ -246,31 +213,58 @@ names(myfiles)<-temp
 
 
 
-set.seed(020) ##so RF gets same result as in paper
-nu=c(0.2,0.5,0.8)  #train data is 20% 50% and 80% of total data
-lnu=length(nu)
-L1=3 #default is 50, number of times train sample is created
-
-#following have 150 rows and 6 columns
-teacc=matrix(0,nrow=L1*lnu,ncol=6)  #accuracy
-tesen=matrix(0,nrow=L1*lnu,ncol=6)  #sensitivity
-tespec=matrix(0,nrow=L1*lnu,ncol=6) #specificity
-
-#i=9
-i=28
+i=9
+#i=28
 nx1<-33:96
 nx2<-97:110
 nx3<-111:159
 ny<-4
 temp1<-process.csv(myfiles[[i]])
+fname<-names(myfiles[i])
 nxx1<-2:65
+nxx2<-66:79
+nxx3<-81:dim(temp1)[2] #80 is Sholl.1 should always be 1
+#nxx<-list(c(nxx1),c(nxx2),c(nxx3))
 
+
+
+###
+## Fit learner and make plots for each view
+###
+
+
+
+set.seed(020) ##so RF gets same result as in paper
+nu=c(0.2,0.5,0.8)  #train data is 20% 50% and 80% of total data
+lnu=length(nu)
+L1=3 #default is 50, number of times train sample is created
+
+#following have L1 rows and 6 columns
+teacc=matrix(0,nrow=L1*lnu,ncol=7)  #accuracy
+colnames(teacc)<-c("Acc %lrn","L-meas_rf","L-meas_pls","Gstat_rf","Gstat_pls","Sholl_rf","Sholl_pls")
+tesen=matrix(0,nrow=L1*lnu,ncol=7)  #sensitivity
+colnames(tesen)<-c("Sen %lrn","L-meas_rf","L-meas_pls","Gstat_rf","Gstat_pls","Sholl_rf","Sholl_pls")
+tespec=matrix(0,nrow=L1*lnu,ncol=7) #specificity
+colnames(tespec)<-c("Spec %lrn","L-meas_rf","L-meas_pls","Gstat_rf","Gstat_pls","Sholl_rf","Sholl_pls")
+
+#for(count in 1:length(nxx)){
 k3<-1
 t1<-proc.time()
 
 for(j in 1:lnu){
   for(i in 1:L1){
     
+    teacc[k3,1]<-nu[j]
+    tesen[k3,1]<-nu[j]
+    tespec[k3,1]<-nu[j]
+    
+    
+    #talk to micheal and culp about this method
+    #because we had several species some having fewer number of samples
+    #than others the standard way of sampling dropped species i.e. 
+    # C. elegans. Predict fxn would throw fits when a species exists in the
+    # untrained but not in the training dataset. The following code subsets
+    # by species, samples from each subset, appends the subsets back together
     for(index in 1:nlevels(temp1$y)){
       samp<-which(temp1$y==names(summary(temp1$y))[[index]])
       if (exists("L")){
@@ -283,42 +277,73 @@ for(j in 1:lnu){
       }
     }
 
-    
-#     L=sample(1:n,ceiling(nu[j]*n))  #training data
-#     U=setdiff(1:n,L)  #test data
-    
-    
-    #grf<-randomForest(y~.,data=temp1[L,c(1,nxx1)])
-    grf<-randomForest(y~.,data=data.frame(y=as.factor(droplevels(temp1[L,1])),temp1[L,c(nxx1)]))
-    
+
+    grf<-randomForest(y~.,data=data.frame(y=temp1[L,1],temp1[L,c(nxx1)]))
     tab=table(predict(grf,newdata=temp1[,nxx1])[U],temp1$y[U])
-#    tab=table(predict(grf,newdata=temp1[,c(nxx1)])[U,],temp1$y[U])
-#    tab=table(predict(grf,newdata=temp1[,c(nxx1)])[U,],temp1$y[U])
+
    # grf<-randomForest(y~.,data=data.frame(y=as.factor(y),x)[L,])
    # tab=table(predict(grf,newdata=x)[U],y[U])
-    
+
     v1<-diag(tab)/ apply(tab,2,sum)
-    teacc[k3,2]<-sum(diag(tab))/sum(tab)
-    tesen[k3,2]<-v1[2]
-    tespec[k3,2]<-v1[1]
+    teacc[k3,2]<-round(sum(diag(tab))/sum(tab),3)
+    tesen[k3,2]<-round(v1[2],3)
+    tespec[k3,2]<-round(v1[1],3)
    
+    y1<-as.numeric(temp1$y)-1
+    gpls<-plsr(y~.,data=data.frame(y=y1[L],temp1[L,c(nxx1)]))
     #gpls<-plsr(y~.,data=temp1[L,c(1,nxx1)])
     #tab=table(predict(gpls,newdata=temp1[,nxx1],ncomp=2)[U]>0.5,temp1$y[U])
-    
+    tab=table(predict(gpls,newdata=temp1[,nxx1],ncomp=10)[U]>0.5,y1[U]) #n=5
 #     gpls<-plsr(y~.,data=data.frame(y,x)[L,])
 #     tab=table(predict(gpls,newdata=x,ncomp=2)[U]>0.5,y[U])
-    #v1<-diag(tab)/ apply(tab,2,sum)
-    #teacc[k3,3]<-sum(diag(tab))/sum(tab)
-    #tesen[k3,3]<-v1[2]
-    #tespec[k3,3]<-v1[1]
+    v1<-diag(tab)/ apply(tab,2,sum)
+    teacc[k3,3]<-round(sum(diag(tab))/sum(tab),3)
+    tesen[k3,3]<-round(v1[2],3)
+    tespec[k3,3]<-round(v1[1],3)
     
     
+grf<-randomForest(y~.,data=data.frame(y=temp1[L,1],temp1[L,c(nxx2)]))
+tab=table(predict(grf,newdata=temp1[,nxx2])[U],temp1$y[U])
+
+v1<-diag(tab)/ apply(tab,2,sum)
+teacc[k3,4]<-round(sum(diag(tab))/sum(tab),3)
+tesen[k3,4]<-round(v1[2],3)
+tespec[k3,4]<-round(v1[1],3)
+
+y1<-as.numeric(temp1$y)-1
+gpls<-plsr(y~.,data=data.frame(y=y1[L],temp1[L,c(nxx2)]))
+tab=table(predict(gpls,newdata=temp1[,nxx2],ncomp=10)[U]>0.5,y1[U]) #n=5
+
+v1<-diag(tab)/ apply(tab,2,sum)
+teacc[k3,5]<-round(sum(diag(tab))/sum(tab),3)
+tesen[k3,5]<-round(v1[2],3)
+tespec[k3,5]<-round(v1[1],3)
+
+
+grf<-randomForest(y~.,data=data.frame(y=temp1[L,1],temp1[L,c(nxx3)]))
+tab=table(predict(grf,newdata=temp1[,nxx3])[U],temp1$y[U])
+
+v1<-diag(tab)/ apply(tab,2,sum)
+teacc[k3,6]<-round(sum(diag(tab))/sum(tab),3)
+tesen[k3,6]<-round(v1[2],3)
+tespec[k3,6]<-round(v1[1],3)
+
+y1<-as.numeric(temp1$y)-1
+gpls<-plsr(y~.,data=data.frame(y=y1[L],temp1[L,c(nxx3)]))
+tab=table(predict(gpls,newdata=temp1[,nxx3],ncomp=10)[U]>0.5,y1[U]) #n=5
+
+v1<-diag(tab)/ apply(tab,2,sum)
+teacc[k3,7]<-round(sum(diag(tab))/sum(tab),3)
+tesen[k3,7]<-round(v1[2],3)
+tespec[k3,7]<-round(v1[1],3)
+
+
+
     cat("nu=",nu[j],"  k3=",k3,"  time=",(proc.time()-t1)/60,"\n")
     k3<-k3+1
     rm(L)
     rm(U)
   }
-  write.table(teacc,"te-acc_4bio.txt",quote=FALSE,row.names=FALSE,col.names=FALSE)
-  write.table(tespec,"te-spec_4bio.txt",quote=FALSE,row.names=FALSE,col.names=FALSE)
-  write.table(tesen,"te-sen_4bio.txt",quote=FALSE,row.names=FALSE,col.names=FALSE)
+  save.metrics(fname)
+
 }

@@ -534,16 +534,16 @@ index=1:30
 
 varimp<-array(NA,dim=c(1,10))
 
-for (i in index[c(28)])
+for (i in index[c(9)])
 {
   varimp<-array(NA,dim=c(1,10))
   ftemp<-array(NA,dim=c(1,2))
   dimnames(ftemp)[[2]]<-c("time (s)","OOB")
   
-  i=28
+  #i=28
   #i=11
   #i=1
-  #i=9
+  i=9
   temp1<-process.csv(myfiles[[i]])
   
   nxx1<-2:65
@@ -606,9 +606,6 @@ for (i in index[c(28)])
 #   dotchart(rfv,main=expression("Co-FTF"[1]*" with Random Foest"),
 #            xlab="Variable Score",cex=1.2,pch=16)
 #   
-  
-  
-  
 
   
 }
