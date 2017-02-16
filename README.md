@@ -57,3 +57,4 @@ Output: appended.csv, the finished appended product
 Maher: stream-line the process of the saving of time and accuracy info, not sure its necessary. I'm sure there is other stuff to do. just ask mike.
 Jesse: abbreviation of tables.
 Mike: Look at the files and come up with more shit for us to do. I know there is more to do before we start looking at the data. We might be approaching the point where we need to come up with metrics derived from other analyses that are as effective as other metrics. ie does the sum of sholl2-sholl7 equal a better metric than depth from l-measure?
+Ok
