@@ -283,9 +283,9 @@ comes from NeuroMorpho.org while `Depth` is computed using the
 [L-measure application](http://cng.gmu.edu:8080/Lm/help/index.htm). I'm
 assuming they should measure the same thing, so even though both
 variables were considered important in variable selection, one of them
-will need to be removed. The issue is: which one should be trusted?
+will need to be removed.
 
-Also coming soon, co-FTF random forest analysis
+Also coming soon, co-FTF random forest analysis, multinomial attempt. 
 
 # Python
 Go to code/python and open in terminal. Run each of the following scripts in order.
