@@ -285,7 +285,46 @@ assuming they should measure the same thing, so even though both
 variables were considered important in variable selection, one of them
 will need to be removed.
 
-Also coming soon, co-FTF random forest analysis, multinomial attempt. 
+Trying a Multinomial Model
+==========================
+
+Another option for classification of this data is use of a *multinomial
+logit* model, as our response (`Species` here) has no natural ordering.
+We will compare the model using the full set of predictors to the model
+using the important variables determined from our previous random forest
+analysis
+
+    library(nnet)
+    multimod <- multinom(y~., data = dat4)
+    multimod1 <- multinom(y ~ Average.Diameter + Overall.Depth + Total.Volume + Total.Surface + Terminal_degree + Rall_Power + Average.Rall.s.Ratio, data = dat4)
+
+    yhat <- predict(multimod)
+    #how many did model get right?
+    ytrue <- dat4$y == predict(multimod)
+    #error rate
+    1-sum(ytrue)/length(ytrue)
+
+    ## [1] 0.3645165
+
+    #only important variables 
+    yhat1 <- predict(multimod1)
+    ytrue1 <- dat4$y == predict(multimod1)
+    #error rate
+    1-sum(ytrue1)/length(ytrue1)
+
+    ## [1] 0.2761884
+
+    #compare deviance
+    (devdiff <- deviance(multimod) - deviance(multimod1))
+
+    ## [1] 7564.908
+
+The error rate is much higher compared a random forest classifier. In
+general, both models have a very large deviance. It is interesting that
+the model containing more predictor variables has a larger deviance.
+More predictors, no matter how insignificant, should result in a lower
+deviance. A multinomial model may not be the best choice here, but it
+could still be an option for future classification problems.
 
 # Python
 Go to code/python and open in terminal. Run each of the following scripts in order.
