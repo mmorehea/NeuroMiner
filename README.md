@@ -19,8 +19,8 @@ Predictor Correlations
 ======================
 
 Variable types in this dataset include both numeric and categorical. If
-they are to be used as predictors, it is important to check the
-correlation or collinearity amongst the predictors.
+the numeric variables are to be used as predictors, it is important to
+check the correlation or collinearity amongst the predictors.
 
     #Some variables need to be properly defined. 
     master$Fractal_Dim<- as.numeric(master$Fractal_Dim) 
@@ -93,8 +93,9 @@ However:
 
     ## [1]   6844.154 261941.000
 
-Whatever the issue may be, `Type` is also being removed for statistical
-purposes.
+When looking at the SWC file, the L-measure function is taking the sum
+of all the labels. Therefore, `Type` is also being removed for
+statistical purposes.
 
 From previous work done on this data, random forests were used in order
 to classify the species type of the neuron.
@@ -102,10 +103,38 @@ to classify the species type of the neuron.
 Random Forest Analysis
 ======================
 
+First, a quick introduction to a statistical random forest (thanks to
+[this paper](http://onlinelibrary.wiley.com/doi/10.1002/cem.1233/epdf)
+for the help).
+
+To have a forest, you need many trees. In statistics, decision tree
+classifiers determine "cut-off" points in predictors, and group the
+observations accordingly. A sequential algorithm is used to construct
+the tree. Optimal tree size is determined through a method called
+cross-validation. The issue with using a single tree is that its
+prediction will have a high variance and a moderate amount of bias. The
+bias means that even small changes to the data can significantly alter
+the construction of the tree, which, in turn, will affect the
+classification accuracy.
+
+Building a group of trees (forest), however, improves the classification
+accuracy and lowers the variance. By applying a random selection
+mechanism to the data (both to the observations andthe features), many
+randomly sampled, alternative data sets are created. In the end, each
+observation is predicted by each tree in the forest and the predicted
+label corresponds to the majority class. The averaging of many tree
+classifiers in a random forest allows the procedure to reduce variance
+of the existing forest, relative to any single tree in it (a fact due to
+the strong law of large numbers). Further, it has been shown that
+constructing trees of maximum sizes leads to reductions in bias.
+Therefore, generating a forest from several large random trees achieves
+both simultaneous bias and variance reduction (relative to a single
+tree).
+
 Although the random forest technique deals very well with correlated
 predictor variables, it is still better to remove them (I would like to
 try multinomial regression with this data). Now, we will proceed using
-only neurons exhibiting a secondary cell class of `pyramidal`
+only neurons exhibiting a secondary cell class of `pyramidal`.
 
     pyramid <- read.csv("pyramidal_appended.csv", header = T)
     #same thing need to properly define variables
@@ -137,7 +166,6 @@ only neurons exhibiting a secondary cell class of `pyramidal`
 
 The model is ready, now for some plots:
 
-    #colors for plot
     cols <- rainbow(length(unique(dat[,1]))+2)
     matplot(g1$err.rate,lwd=2,col=cols,lty=1,type="l", main = "Species Error Rate", ylab = "Error rate", xlab = "Number of Trees")
 
@@ -186,10 +214,11 @@ at some boxplots of this variable and compare the distribution between
 all species types.
 ![](Markdown_figures/boxplot.master-1.png)
 
-Due to the outliers, this was interesting. I'm not sure if the neurons
-are just that much large, or if it is an error in the L-measure
-computations. Anyway, since our analysis is restricted to pyramidal
-cells at the moment, let us recreate this boxplot to account for that.
+Due to the outliers, this was interesting. I'm not sure if these outlier
+rat and chicken neurons are just that much larger than any others, or if
+it is an error in the L-measure computations. Anyway, since our analysis
+is restricted to pyramidal cells at the moment, let us recreate this
+boxplot to account for that.
 
 ![](Markdown_figures/box.plot.pyramidals-1.png)
 Again, some rats have much larger neurons. These outlier observations
@@ -248,13 +277,16 @@ testing error before removing variables, after removal of redundant
 variables, and after removal of redundant variables as well as species
 with a small sample size:
 
-![](Markdown_figures/comparison-1.png) \# One Final
-Variable Relationship Referring back to the Variable Importance Plot,
-the variables `Depth` and `Overall.Depth` have an interesting
-relationship. Check out the plot below:
-![](Markdown_figures/depth-1.png) The plot would
-like to exhibit a strong positive correlation, but there seems to be a
-lot of noise in the bottom left portion.
+![](Markdown_figures/comparison-1.png)
+
+One Final Variable Relationship
+===============================
+
+Referring back to the Variable Importance Plot, the variables `Depth`
+and `Overall.Depth` have an interesting relationship. Check out the plot
+below: ![](Markdown_figures/depth-1.png) The plot
+would like to exhibit a strong positive correlation, but there seems to
+be a lot of noise in the bottom left portion.
 
     #finding discrepancies between Depth and Overall Depth variables
     collect <- vector(length=dim(pyramid)[1])
@@ -282,8 +314,8 @@ Depth is supposedly a measure of the z-axis of a neuron. `Overall.Depth`
 comes from NeuroMorpho.org while `Depth` is computed using the
 [L-measure application](http://cng.gmu.edu:8080/Lm/help/index.htm). I'm
 assuming they should measure the same thing, so even though both
-variables were considered important in variable selection, one of them
-will need to be removed.
+variables were considered important in variable selection, `Depth` will
+need to be removed for now since it came from the L-measure tool.
 
 Trying a Multinomial Model
 ==========================
@@ -325,60 +357,3 @@ the model containing more predictor variables has a larger deviance.
 More predictors, no matter how insignificant, should result in a lower
 deviance. A multinomial model may not be the best choice here, but it
 could still be an option for future classification problems.
-
-# Python
-Go to code/python and open in terminal. Run each of the following scripts in order.
-
-# nameListMaker.py
-Input: URL for page with all of the cells - hardcoded in the script
-+ If you change the URL, you MUST also delete the file NeuroMiner/data_sets/neuroData.csv AND delete all contents of the folder NeuroMiner/swcs (but keep the empty folder)
-
-Output: NeuroMiner/code/python/names/names_list_complete.p
-
-# NeuroMiner.py
-Input: NeuroMiner/code/python/names/names_list_complete.p - the output of nameListMaker.py
-
-Output:
-+ Cell data in NeuroMiner/data_sets/neuroData.csv
-+ swc files in NeuroMiner/swcs
-
-Required packages: 
-
-The following packages should be installed by default as part of Anaconda:
-+ pandas
-+ requests
-+ beautifulsoup4
-
-This one is probably not included for you:
-+ html5lib
-
-WARNING: the newest version of html5lib contains a bug that causes the program to fail. Use an older version of html5lib until the bug is fixed.
-
-Any that weren't included can be installed using:
-```
-sudo pip install beautifulsoup4
-sudo pip install html5lib
-sudo pip install requests
-sudo pip install pandas
-```
-
-If you are still having problems, run the install commands again with --upgrade after each one to ensure you have the latest version.
-
-#swcGrouper.py
-Input: ./swcs/ folder containing all the swcs
-
-Output: ./swcs/ folder with the swcs grouped neatly into folders of 1500 each
-
-#LM.jar and LM2features.py
-Input: swcs in the ./swcs/ folder
-
-Output: NeuroMiner/data_sets/raw/fixedLmResult.csv
-
-Directions:
-LM.jar can effectively handle only 1500 files at a time. Therefore, run swcGrouper.py to glob all the swcs in ./swcs/ and put them in directories of 1500 each. Then point LM.jar at each one, and name the output files in such a way that you can discern the order, e.g. 1, 2, 3, etc. Then run LM2features.py on each one in turn.
-
-#appender.py
-Input: neuroData.csv, fixedLmResult.csv, and gstats.csv, which should all be in NeuroMiner/data_sets/raw/
-
-Output: appended.csv, the finished appended product
-
