@@ -1,12 +1,11 @@
 Classification of Species using NeuroMorpho Data
 ================================================
 
-This analysis is interested in the classification of species type (the
-response). Data from [NeuroMorpho.org](neuromorpho.org) as well as
+This analysis is concerned with the classification of species type. Data from [NeuroMorpho.org](http://www.neuromorpho.org) as well as
 [L-measure functions](http://cng.gmu.edu:8080/Lm/help/index.htm) were
 used to obtain both qualitative and quantitative measurements from
 neuronal reconstructions (the predictors). The computer program `R` is
-used for statistical analysis. Code to read data is shown below
+used for statistical analysis.
 
     master <- read.csv("NeuronDataMaster.csv", header = T)
     dim(master) #this table has 18,374 observations and 160 variables
@@ -78,8 +77,7 @@ is a linear combination and does not give any new information. For now,
 highly correlated angle measurements such as `bif_ampl_remote` will be
 removed.
 
-According to the [site](http://cng.gmu.edu:8080/Lm/help/index.htm) that
-compiled our NeuroMorpho data to compute L-measures, the variable `Type`
+According to the [L-measure help page](http://cng.gmu.edu:8080/Lm/help/index.htm) , the variable `Type`
 is defined to return type of compartment, with options being soma = 1,
 axon = 2, basal dendrites = 3, and apical dendrites = 4. This is
 technically a categorical variable and should be defined as such in `R`.
@@ -103,14 +101,13 @@ to classify the species type of the neuron.
 Random Forest Analysis
 ======================
 
-First, a quick introduction to a statistical random forest (thanks to
-[this paper](http://onlinelibrary.wiley.com/doi/10.1002/cem.1233/epdf)
-for the help).
-
-To have a forest, you need many trees. In statistics, decision tree
+First, a quick introduction to the random forest classification technique (
+[citation](http://onlinelibrary.wiley.com/doi/10.1002/cem.1233/epdf)
+).
+In statistics, decision tree
 classifiers determine "cut-off" points in predictors, and group the
 observations accordingly. A sequential algorithm is used to construct
-the tree. Optimal tree size is determined through a method called
+this tree. Optimal tree size is determined through a method called
 cross-validation. The issue with using a single tree is that its
 prediction will have a high variance and a moderate amount of bias. The
 bias means that even small changes to the data can significantly alter
@@ -256,7 +253,7 @@ The higher error rates seem to have a lower sample size (guinea pig) and
 very similar median average diameters. Since this is (so far) the most
 important variable, the classifier may be confusing minke whale with
 humpback whale, as well as cat and proechimys with rats, chimps, and
-mice. So, let's remove these observations.
+mice. So, I remove these observations.
 
 ![](Markdown_figures/random.forest.modded.data-1.png)
 
