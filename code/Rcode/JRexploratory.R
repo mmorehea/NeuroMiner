@@ -41,8 +41,11 @@ summary(lm(x$Total.Volume~x$Total.Surface))
 summary(lm(x$EucDistance~x$PathDistance))
 summary(lm(x$Soma.Surface~ x$Soma_Surface)) #correlation of 1
 summary(lm(x$Total.Fragmentation~x$Fragmentation)) #correlation of 1
+summary(lm(x$Height~x$Overall.Height))
+summary(lm(x$Fractal.Dimension~x$Fractal_Dim))
 
 #2/21/17
+setwd("../Desktop/NeuroMiner/data_sets")
 master <- read.csv("NeuronDataMaster.csv", header = T)
 master <- master[,-c(83,84,85)] #these are pk variables with many NA
 master$Fractal_Dim<- as.numeric(master$Fractal_Dim) #Fractal_dim
@@ -75,14 +78,14 @@ bymeds <- with(master, reorder(master[,4],master$Average.Diameter,median))
 library(gplots)
 pdf("orderedbox.pdf",14,8)
 boxplot(master$Average.Diameter~bymeds, pch = 16, col = cols, xaxt = "n",main = "Average Diameter by Species", ylab = expression(paste("Diameter (", mu,"m)")))
-angleAxis(1,levels(bymeds), at = c(1:length(levels(bymeds))), srt = 35)
+angleAxis(1,levels(master[,4]), at = c(1:length(levels(bymeds))), srt = 35)
 dev.off()
 
 #reduced correlation master data frame
 #keep soma.surface rm soma_surface
 #remove all branches since it is linear combination
-colnames(master)[c(36,54,55,56,57,62,65,66,76,78, 83:91)]
-master <- master[,-c(36,54,55,56,57,62, 65,66,76,78, 83:91)] 
+colnames(master)[c(36,54,55,56,57,60,61,62,65,66,68,76,78, 83:91, 111, 160)]
+master <- master[,-c(36,54,55,56,57,60,61,62,65,66,68,76,78, 83:91, 111, 160)]
 
 cors2 <- cor(master[,33:79])
 cormat2 <- as.matrix(cors2)
@@ -99,10 +102,10 @@ read coftf paper and finally got cftf package running
 collect <- vector(length=dim(x)[1])
 #which rows are these 2 not equal
 for(i in 1:dim(x)[1])
-collect[i] <- sum(x[i,38] != x[i,56])
+collect[i] <- sum(x[i,39] != x[i,61])
 
-diffs <- x[which(collect == 1),38] - x[which(collect == 1),56]
-x[which(collect == 1)[6561],c(4,33:78)] #big difference over 1k square micron
+diffs <- x[which(collect == 1),39] - x[which(collect == 1),61]
+x[which(collect == 1)[3545],c(4,33:78)] #big difference over 1k square micron
 plot(master$Depth, master$Overall.Depth, pch = 16, xlim = c(0,600), ylim = c(0,600))
 which(diffs > 500)
 #which of overall depth and depth should be used?
@@ -121,4 +124,51 @@ pdf("orderedbox.pdf",14,8)
 boxplot(master$Average.Diameter~bymeds, pch = 16, col = cols, xaxt = "n",main = "Average Diameter by Species", ylab = expression(paste("Diameter (", mu,"m)")))
 angleAxis(1,levels(bymeds), at = c(1:length(levels(bymeds))), srt = 35)
 dev.off()
+#2/28/17
+#finished Rmd and README.md file
+#3/1/17
+#trying to reproduce computations using the L-measure GUI 
+#3/2/17
+(max(neur1[,3]))^2 +
 
+(max(neur1[,4]))^2 +
+
+(max(neur1[,5]))^2
+#3/3/17
+Find a way to re-run neuro data master through l-measure 
+for soma surface and stuff. 
+#way to get files from web to comp
+#need tolower() for all lower case
+library(nat)
+for(i in j:dim(master)[1]){
+tryCatch({
+int <- paste("http://neuromorpho.org/dableFiles/",tolower(master[i,3]),"/CNG%20version/",master[i,2],".CNG.swc", sep = "")
+int2 <- read.neuron(int)
+write.neuron(int2, file = paste(master[i,2],".swc", sep = ""))
+}, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+}
+pi*r1*(r1+sqrt(h^2+r1^2
+
+
+neuro1 <- read.neuron("http://neuromorpho.org/dableFiles/hirsch/CNG%20version/940224finald.CNG.swc")
+
+#3/7/17
+#multinomial
+library(nnet)
+mmod <- multinom(y ~ Average.Diameter + Overall.Depth + Total.Volume + Total.Surface + Terminal_degree + Rall_Power + Average.Rall.s.Ratio, dat100)
+step(mmod)
+y11 <- predict(mmod1)
+yt1 <- dat100$y == predict(mmod1)
+sum(yt1)/length(yt1)
+mmod1 <- multinom(y ~ ., dat100) #dat100 is data set with most species removed
+#does not work well
+
+#3/8/17
+#applied for job, found old statistic assignments emails to yourself
+#didn't get much done 
+
+#3/10/17
+#use tryCatch() to bypass error in loop, retrieved most swc files from master
+
+#3/14/17
+#started running cftf. made new file 

@@ -1,7 +1,7 @@
 library(randomForest)
 
-read.csv("./raw/first_subsets/pyramidal_appended.csv",T)->x
-read.csv("./raw/first_subsets/pyramidal_appended.csv",T)->x1 #extra full set for reference
+read.csv("./raw/first_subsets/pyramidal_appended.csv",T)-> pyr
+read.csv("./raw/first_subsets/pyramidal_appended.csv",T)->x #extra full set for reference
 x[1213,64] <- 3477.808 #average total volume for minke whale
  #take out columns with many NA
 x$Fractal_Dim <- as.numeric(x$Fractal_Dim)
@@ -9,10 +9,10 @@ x$Soma.Surface<-as.numeric(x$Soma.Surface)
 colnames(x)[c(36,54,55,56,57,62,65,66,76,78, 83:91)]
 x <- x[,-c(36,54,55,56,57,62,65,66,76,78, 83:91)]
 nx1<-33:77
-nx2<-78:161
+nx2<-78:143
 ny<-4
 dat1 <- data.frame(y=as.factor(x[,ny]),x[,nx1])
-#dat<-data.frame(y=as.factor(x[,ny]),x[,c(nx1,nx2)])
+dat<-data.frame(y=as.factor(x[,ny]),x[,c(nx1,nx2)])
 dat1<-na.omit(dat1)
 coll <- vector(length = dim(x)[1])
  for(i in 1:dim(x)[1])
@@ -23,7 +23,7 @@ nxx2<-67:dim(dat)[2]
 
 set.seed(100)
 g1<-randomForest(y~.,data=dat1)##,prox=TRUE)
-cols=rainbow(length(unique(dat1[,1]))+2)
+cols=rainbow(length(levels(master[,4]))+2)
 matplot(g1$err.rate,lwd=2,col=cols,lty=1,type="l", main = "Species Error Rate", ylab = "Error rate", xlab = "Number of Trees")
 ##MAP cols to dimnames(g$err.rate)[[2]]
 varImpPlot(g1, pch = 16, main = "Variable Importance")
@@ -57,14 +57,27 @@ es2 <- which(datmw[,1] == "cat")
 es3 <- which(datmw[,1] == "guinea pig")
 dat4 <- datmw[-c(es2,es3),]
 dat4$y <- factor(dat4$y)
-g4 <- randomForest(y~.,data=dat4)##,prox=TRUE)
+g4 <- randomForest(y~.,data=dat4[,-c(23,24,25,29)])##,prox=TRUE)
 cols2=rainbow(length(unique(dat4[,1]))+2)
 matplot(g4$err.rate,lwd=2,col=cols,lty=1,type="l")
 ##MAP cols to dimnames(g4$err.rate)[[2]]
 varImpPlot(g4)
 sort(g4$confusion[,11])
 #bottlenose dolphin still high but all below 0.5 now
-#taking out predictors with collinearity issue 
+#taking out predictors with collinearity issue
+ 
+#Take out proechimys, cat, guinea pig, whales, elephant, dolphin
+es4 <- which(dat4[,1] == "humpback whale")
+es5 <- which(dat4[,1] == "bottlenose dolphin")
+es6 <- which(dat4[,1] == "elephant")
+dat100 <- dat4[-c(es4, es5, es6),]
+dat100$y <- factor(dat100$y)
+set.seed(100)
+g100 <- randomForest(y~.,data=dat100)##,prox=TRUE)
+cols=rainbow(length(unique(dat100[,1]))+2)
+matplot(g100$err.rate,lwd=2,col=cols,lty=1,type="l")
+varImpPlot(g100, pch = 16)
+sort(g100$confusion[,8])
 
 #using sholls
 set.seed(100)

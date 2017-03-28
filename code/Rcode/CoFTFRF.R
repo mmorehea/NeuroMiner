@@ -85,7 +85,8 @@ mkdirs <- function(fp) {
   obj=structure(list(model=ans,learn=learn,type=ctype,m=length(L),n=n),class="cftf")
   obj
 }
-
+#end cftf
+#cftf needs this next function
 `ftf.rf.ctrain`<-function(x,z,w,y,k=30,L,U,
                           type=c("none","left","right"),
                           verbose=FALSE,...){
@@ -107,8 +108,8 @@ mkdirs <- function(fp) {
     }
   }
   
-  #need to make the following work for the three measurements
-  # tree, scholl and l-measure
+#need to make the following work for the three measurements
+#tree, scholl and l-measure
   if(type=="right"){
     f<-function(a1,a2,a3){
       vec<-apply(cbind(a1[,2],a2[,2],a3[,2]),1,which.max)
