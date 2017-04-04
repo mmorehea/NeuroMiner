@@ -442,7 +442,7 @@ observations. The random forest analysis that follows will sample 1000
 observations from each of these 3 regions, and then classify them using
 the L-measure predictor matrix from before (R code omitted).
 
-![](Markdown_figures/brainregion.png)![](Markdown_figures/varimpbrain.png)
+![](Markdown_figures/New Folder/brainregion.png)![](Markdown_figures/New Folder/varimpbrain.png)
 
 The overall error rate is about 5.27%. Neocortex seems to be the most
 difficult to classify. It contains the most number of observations, so
@@ -452,7 +452,7 @@ sample. The most important variables in classifying the
 `Overall.Depth` The following pie chart shows the percentage of neurons
 from a secondary brain region when they come from the neocortex:
 
-![](Markdown_figures/piechart_brain.png)
+![](Markdown_figures/New Folder/piechart_brain.png)
 
 Many secondary brain regions are underrepresented...
 
@@ -473,7 +473,7 @@ then a random forest will try to classify the two remaining cell
 classes. A random sample of 3000 is taken from each of `interneuron` and
 `principal cell`.
 
-![](Markdown_figures/prim_cellclass.png)![](Markdown_figures/varimp_cellclass.png)
+![](Markdown_figures/New Folder/prim_cellclass.png)![](Markdown_figures/New Folder/varimp_cellclass.png)
 
 The overall error rate is much higher than with `Primary.Brain.Region`
 (around 11.72%). The interneuron error rate is at 15.5%. One way to
@@ -484,6 +484,6 @@ are important in classifying `Primary.Cell.Class`. The pie charts below
 show `Secondary.Cell.Class` for the entire set of interneurons and
 principal cells.
 
-![](Markdown_figures/pie_inter.png)
+![](Markdown_figures/New Folder/pie_inter.png)
 
-![](Markdown_figures/pie_pc.png)
+![](Markdown_figures/New Folder/pie_pc.png)
