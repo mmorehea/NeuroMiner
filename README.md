@@ -354,3 +354,136 @@ the model containing more predictor variables has a larger deviance.
 More predictors, no matter how insignificant, should result in a lower
 deviance. A multinomial model may not be the best choice here, but it
 could still be an option for future classification problems.
+
+More Classification using Random Forest
+=======================================
+
+Other responses of interest from the `master` NeuroMorpho dataset
+include:
+
+    colnames(master)[c(6,15,19)]
+
+    ## [1] "Structural.Domains"   "Primary.Brain.Region" "Secondary.Cell.Class"
+
+    levels(master$Structural.Domains)
+
+    ## [1] "Dendrites, Soma, Axon"    "Dendrites, Soma, No Axon"
+
+    levels(master$Primary.Brain.Region)
+
+    ##  [1] "amygdala"                   "antennal lobe"             
+    ##  [3] "anterior olfactory nucleus" "basal forebrain"           
+    ##  [5] "basal ganglia"              "brainstem"                 
+    ##  [7] "cerebellum"                 "dorsal thalamus"           
+    ##  [9] "entorhinal cortex"          "hippocampus"               
+    ## [11] "hypothalamus"               "main olfactory bulb"       
+    ## [13] "mesencephalon"              "myelencephalon"            
+    ## [15] "neocortex"                  "optic Lobe"                
+    ## [17] "peripheral nervous system"  "pharyngeal nervous system" 
+    ## [19] "pons"                       "retina"                    
+    ## [21] "somatic nervous system"     "spinal cord"               
+    ## [23] "stomatogastric ganglion"    "subiculum"                 
+    ## [25] "thalamus"                   "ventral striatum"          
+    ## [27] "ventral thalamus"
+
+    levels(master$Primary.Cell.Class)
+
+    ## [1] "interneuron"      "Not reported"     "principal cell"  
+    ## [4] "sensory receptor"
+
+With the `Structural.Domains` variable, random forests can classify
+whether or not a neuron in the `master` dataset has an axon.
+`Primary.Brain.Region` includes 27 possible regions. This will need to
+be modified before I predict this variable using a random forest. Some
+of the brain regions have a very small sample size. The
+`Primary.Cell.Class` variable can be reduced to a binary variable (~ 99%
+of neurons in this dataset classify as either `interneuron` or
+`principal cell`).
+
+Primary Brain Region
+--------------------
+
+As stated before, neurons in this dataset come from 27 possible primary
+brain regions.
+
+    summary(master$Primary.Brain.Region)
+
+    ##                   amygdala              antennal lobe 
+    ##                        190                          3 
+    ## anterior olfactory nucleus            basal forebrain 
+    ##                        303                          5 
+    ##              basal ganglia                  brainstem 
+    ##                        431                        217 
+    ##                 cerebellum            dorsal thalamus 
+    ##                        342                          5 
+    ##          entorhinal cortex                hippocampus 
+    ##                         35                       1931 
+    ##               hypothalamus        main olfactory bulb 
+    ##                         33                         75 
+    ##              mesencephalon             myelencephalon 
+    ##                          4                         85 
+    ##                  neocortex                 optic Lobe 
+    ##                      12606                         56 
+    ##  peripheral nervous system  pharyngeal nervous system 
+    ##                         17                         11 
+    ##                       pons                     retina 
+    ##                          1                       1439 
+    ##     somatic nervous system                spinal cord 
+    ##                        194                        162 
+    ##    stomatogastric ganglion                  subiculum 
+    ##                          3                        122 
+    ##                   thalamus           ventral striatum 
+    ##                          3                        380 
+    ##           ventral thalamus 
+    ##                         45
+
+Only 3 regions (hippocampus, neocortex, and retina) have more than 1000
+observations. The random forest analysis that follows will sample 1000
+observations from each of these 3 regions, and then classify them using
+the L-measure predictor matrix from before (R code omitted).
+
+![](Markdown_figures/brainregion.png)![](Markdown_figures/varimpbrain.png)
+
+The overall error rate is about 5.27%. Neocortex seems to be the most
+difficult to classify. It contains the most number of observations, so
+perhaps a simple random sample of 1000 is not giving a representative
+sample. The most important variables in classifying the
+`Primary.Brain.Region` are `Average.Bifurcation.Angle.Remote` and
+`Overall.Depth` The following pie chart shows the percentage of neurons
+from a secondary brain region when they come from the neocortex:
+
+![](Markdown_figures/piechart_brain.png)
+
+Many secondary brain regions are underrepresented...
+
+Primary Cell Class
+------------------
+
+Again, we see what there is to work with when looking at
+`Primary.Cell.Class` from NeuroMorpho:
+
+    summary(master$Primary.Cell.Class)
+
+    ##      interneuron     Not reported   principal cell sensory receptor 
+    ##             5267              137            13210               84
+
+Most are either principal cells or interneurons. The not reported (which
+are all rats) and sensory receptor observations will be removed, and
+then a random forest will try to classify the two remaining cell
+classes. A random sample of 3000 is taken from each of `interneuron` and
+`principal cell`.
+
+![](Markdown_figures/prim_cellclass.png)![](Markdown_figures/varimp_cellclass.png)
+
+The overall error rate is much higher than with `Primary.Brain.Region`
+(around 11.72%). The interneuron error rate is at 15.5%. One way to
+lower this (again) might be to try a better sampling approach. The
+important variables here are different than for `Primary.Brain.Region`.
+Variables such as `PathDistance`, `EucDistance`, and `Terminal_degree`
+are important in classifying `Primary.Cell.Class`. The pie charts below
+show `Secondary.Cell.Class` for the entire set of interneurons and
+principal cells.
+
+![](Markdown_figures/pie_inter.png)
+
+![](Markdown_figures/pie_pc.png)
