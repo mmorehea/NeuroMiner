@@ -33,8 +33,8 @@ y <- dat[,1]
 x <- dat[,c(2:46)]
 z <- dat[,c(47:60)]
 w <- dat[,c(61:dim(dat)[2])] 
-apply(z, 2, class)
-apply(x, 2, class)
+lapply(z,  class)
+lapply(x,  class)
 apply(w, 2, class)
 n <- length(y)
 #make sure all numeric or integer
@@ -45,9 +45,10 @@ set.seed(100)
 L=sample(1:n,ceiling(n*.5))
 U=setdiff(1:n,L)
 y[U]=NA
-crf<-cftf(x,z,w,y,k=5,L,U,learn="RF",type=1)
+crf<-cftf(x,z,y,k=5,L,U,learn="RF",type=NA)
+crf1<-cftf(x,z,y,k=1,1:n,NULL,learn="RF",type=NA, local = TRUE)
 #make a table (type I and type II error)
-tabrf <- table(crf$model$yU,dat[,1][U])
+tabrf <- table(crf$model$yU,dat[,18][U])
 tabrf
 sum(diag(tabrf))/sum(tabrf)
 kapstat(tabrf)
@@ -93,3 +94,13 @@ coll2[i] <- pp$p.mult
 #remember anytime with t-test with absolute value need to double p value
 #3/23/17
 #write an RMD file soon 
+
+#3/28/17
+#coftfrf for brain region
+y <- dat[,18]
+y <- factor(y)
+x <- dat[,nlmeasure]
+z <- dat[,c(ngstat, nsholl)]
+#need to ask about coftfrf for multinomial
+#also ask about coftfrf code where it says type of random forest: regression
+#change type in cftf function so it does not weight 0 or 1 anymore than the other. 
