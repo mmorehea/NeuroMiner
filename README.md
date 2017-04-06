@@ -444,10 +444,10 @@ the L-measure predictor matrix from before (R code omitted).
 
 ![](Markdown_figures/brainregion.png)![](Markdown_figures/varimpbrain.png)
 
-The overall error rate is about 5.27%. Neocortex seems to be the most
-difficult to classify. It contains the most number of observations, so
-perhaps a simple random sample of 1000 is not giving a representative
-sample. The most important variables in classifying the
+The overall error rate (OOB) is shown in the plot. Neocortex seems to be
+the most difficult to classify. It contains the most number of
+observations, so perhaps a simple random sample of 1000 is not giving a
+representative sample. The most important variables in classifying the
 `Primary.Brain.Region` are `Average.Bifurcation.Angle.Remote` and
 `Overall.Depth` The following pie chart shows the percentage of neurons
 from a secondary brain region when they come from the neocortex:
@@ -475,9 +475,9 @@ classes. A random sample of 3000 is taken from each of `interneuron` and
 
 ![](Markdown_figures/prim_cellclass.png)![](Markdown_figures/varimp_cellclass.png)
 
-The overall error rate is much higher than with `Primary.Brain.Region`
-(around 11.72%). The interneuron error rate is at 15.5%. One way to
-lower this (again) might be to try a better sampling approach. The
+The overall error rate (shown as OOB in the plot) is higher than with
+`Primary.Brain.Region`. The interneuron error rate is the worst. One way
+to lower this (again) might be to try a better sampling approach. The
 important variables here are different than for `Primary.Brain.Region`.
 Variables such as `PathDistance`, `EucDistance`, and `Terminal_degree`
 are important in classifying `Primary.Cell.Class`. The pie charts below
@@ -487,3 +487,11 @@ principal cells.
 ![](Markdown_figures/pie_inter.png)
 
 ![](Markdown_figures/pie_pc.png)
+
+Axon Classification
+-------------------
+
+As stated earlier, we can also classify whether or not a neuron has an
+axon as part of its structure. Random forest gets about 90%. CoFTFRF
+gets about 87.5% Most important variables: Total Volume Total Surface
+Daughter Ratio Terminal Degree Average Diameter
