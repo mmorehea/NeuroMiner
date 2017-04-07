@@ -591,7 +591,7 @@ for (i in index[c(9)])
   crf1<-cftf(x=temp1[,c(nxx1)],z=temp1[,c(nxx2)],w=temp1[,c(nxx3)],y,k=1,1:n,NULL,learn="RF",type=1,local=TRUE)
   
   ## Necessary processing for plot
-  nvar=15  
+  nvar=20  
   gx=crf1$model$gx
   gz=crf1$model$gz
   gw=crf1$model$gw
@@ -599,13 +599,13 @@ for (i in index[c(9)])
   xvar<-apply(gx$local[,vecind==1],1,sum)
   zvar<-apply(gz$local[,vecind==2],1,sum)
   wvar<-apply(gw$local[,vecind==3],1,sum)
-  rfv<-sort(c(xvar,zvar,wvar),dec=TRUE)[nvar:1]
+  rfv<-sort(c(xvar,zvar),dec=TRUE)[15:1]
   
   
-  save.CoFTFRF(rfv,names(myfiles[i]))
+  save.CoFTFRF(rfv)
   ## Make plot
-#   dotchart(rfv,main=expression("Co-FTF"[1]*" with Random Foest"),
-#            xlab="Variable Score",cex=1.2,pch=16)
+  dotchart(rfv,main=expression("Co-FTF"[1]*" with Random Forest"),
+            xlab="Variable Score",cex=1.05,pch=16)
 #   
 
   
