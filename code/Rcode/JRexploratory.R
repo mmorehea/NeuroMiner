@@ -1,8 +1,3 @@
-axon <- x[,6]
-summary(axon)
-levels(axon) <- c("DSA", "DSNA")
-yesaxon <- which(axon == "DSA")
-noaxon <- which(axon == "DSNA")
 means<-tapply(x[,40],x[,4],median)
 #run g1 random forest from pyramid.R
 cbind(summary(x[,4]),g1$confusion[,15],means)->ex
@@ -35,8 +30,8 @@ bigrats <- which(x[,4] == "rat")
 which(x[bigrats,]$Total.Volume>300000)
 xout <- x[-c(1353,3542,8718,9063),] #take out outlier rats ??
 #Overall Depth and Depth are highly correlated so don't use 
-summary(lm(x$Depth~x$Overall.Depth))
-summary(lm(x$Surface~x$Total.Surface)) #correlation of 0.99
+summary(lm(whole$Depth~whole$Overall.Depth))
+summary(lm(whole$Surface~whole$Total.Surface)) #correlation of 0.99
 summary(lm(x$Total.Volume~x$Total.Surface))
 summary(lm(x$EucDistance~x$PathDistance))
 summary(lm(x$Soma.Surface~ x$Soma_Surface)) #correlation of 1
@@ -115,13 +110,13 @@ which(diffs > 500)
 #think of more plots but need to ask Mark Culp about his cftf codes
 #2/27/17
 #writing Rmd file 
-boxplot2(pyramid1$Average.Diameter~pyramid1[,4], pch = 16, col = cols)
-boxplot2(pyramid1$Average.Diameter~bymeds, pch = 16, col = cols)
-bymeds <- with(pyramid1, reorder(pyramid1[,4],pyramid1$Average.Diameter,median))
+boxplot2(whole$Average.Diameter~whole[,4], pch = 16, col = cols)
+boxplot2(whole$Average.Diameter~bymeds, pch = 16, col = cols2)
+bymeds <- with(whole, reorder(whole[,4],whole$Average.Diameter,median))
 #bymeds used to order boxplot
 library(gplots)
 pdf("orderedbox.pdf",14,8)
-boxplot(master$Average.Diameter~bymeds, pch = 16, col = cols, xaxt = "n",main = "Average Diameter by Species", ylab = expression(paste("Diameter (", mu,"m)")))
+boxplot(whole$Average.Diameter~bymeds, pch = 16, col = cols2, xaxt = "n",main = "Average Diameter by Species", ylab = expression(paste("Diameter (", mu,"m)")))
 angleAxis(1,levels(bymeds), at = c(1:length(levels(bymeds))), srt = 35)
 dev.off()
 #2/28/17
@@ -135,8 +130,8 @@ dev.off()
 
 (max(neur1[,5]))^2
 #3/3/17
-Find a way to re-run neuro data master through l-measure 
-for soma surface and stuff. 
+#Find a way to re-run neuro data master through l-measure 
+#for soma surface and stuff. 
 #way to get files from web to comp
 #need tolower() for all lower case
 library(nat)
@@ -145,7 +140,7 @@ tryCatch({
 int <- paste("http://neuromorpho.org/dableFiles/",tolower(master[i,3]),"/CNG%20version/",master[i,2],".CNG.swc", sep = "")
 int2 <- read.neuron(int)
 write.neuron(int2, file = paste(master[i,2],".swc", sep = ""))
-}, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+}, error=function(e){cat("Error in",conditionMessage(e), "\n")})
 }
 pi*r1*(r1+sqrt(h^2+r1^2
 
@@ -200,11 +195,13 @@ y <- factor(y)
 rf1 <- randomForest(y ~ ., data = dat[,nlmeasure])
 #coll[i] <- 1 - sum(diag(rf1$confusion))/sum(rf1$confusion)
 }
-cols2 <- rainbow(length(levels(y))+1)
+cols2 <- rainbow(length(levels(whole[,4]))+1)
 matplot(rf1$err.rate,lwd=2,col=cols2,lty=1,type="l", main = "Classification of Primary Brain Region", xlab = "Number of Trees used", ylab = "Error rate")
-legend(300,.2,  legend = colnames(rf1$err.rate), col = cols2, lty=1, lwd = 2)
+legend(300,.18,  legend = colnames(rf1$err.rate), col = cols2, lty=1, lwd = 2)
+points(rep(500,4),rf1$err.rate[500,], col = cols2, pch = 16, cex = 1.3)
+text(rep(490,4), rf1$err.rate[500,]+.0075, labels = round(rf1$err.rate[500,],3))
 pdf("brainregion.pdf")
-varImpPlot(rf1, pch = 16)
+varImpPlot(rf1, pch = 16, n.var = 20, main = "Importance in Classifying Brain Region")
 
 #not reported under primary cell class are all rat
 #species name might be cheating when using as a predictor
@@ -234,16 +231,19 @@ s21 <- sample(pc, 3000)
 dat1 <- rbind(inter[s11,],inter[s21,])
 y <- dat1[,18]
 y <- factor(y)
+
 set.seed(100)
 rf2 <- randomForest(y ~ ., data = dat1[,nlmeasure])
 colrf2 <- rainbow(length(levels(y))+1)
 matplot(rf2$err.rate,lwd=2,col=colrf2,lty=1,type="l", main = "Classification of Primary Cell Class", xlab = "Number of Trees used", ylab = "Error rate")
-legend(300,0.2, legend = colnames(rf2$err.rate), col = colrf2, lty=1, lwd = 2)
+legend(300,0.22, legend = colnames(rf2$err.rate), col = colrf2, lty=1, lwd = 2)
+points(rep(500,3),rf2$err.rate[500,], col = colrf2, pch = 16, cex = 1.3)
+text(rep(490,3), rf2$err.rate[500,]+.01, labels = round(rf2$err.rate[500,],3))
 varImpPlot(rf2, pch = 16, main = "Importance in predicting cell class")
 pdf('varimpcol18.pdf')
-pdf('prim_cell_class.pdf')
+png('prim_cell_class.png')
 
-#pie chart for secondary cell of neocortex
+#pie chart for secondary cell and brain region
 which(summary(master[neo,16]) == 0) -> delete
 delete2 <- which(summary(inter[ineuron,19]) < 20)
 delete3 <- which(summary(inter[pc,19]) < 20)
@@ -260,3 +260,30 @@ dev.off()
 pdf("piechart3.pdf")
 pie(summary(inter[pc,19])[-delete3], labels = names(summary(inter[pc,19])[-delete3]), main = "Secondary cell class for Principal Cell", col = cols4)
 dev.off()
+
+#4/5/17
+#axon classification
+axon <- master[,6]
+summary(axon)
+levels(axon) <- c("DSA", "DSNA")
+yes <- which(axon == "DSA")
+no <- which(axon == "DSNA")
+syes <- sample(yes, 4000)
+sno <- sample(no, 4000)
+daxon <- rbind(master[syes,], master[sno,])
+y <- daxon[,6]
+levels(y) <- c("DSA", "DSNA")
+n <- length(y)
+
+set.seed(238)
+L=sample(1:n,ceiling(n*.5))
+U=setdiff(1:n,L)
+y[U]=NA
+rf3 <- randomForest(y[L]~., ytest = y[U], data = daxon[L,nlmeasure])
+varImpPlot(rf3, pch = 16, main = "Axon")
+#daughter ratio
+
+#4/27/17
+#mining the rest of neurons from neuromorpho
+#python script easier 
+#new script to format data from wide to long
